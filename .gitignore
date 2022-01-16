@@ -1,0 +1,6 @@
+**/*.sublime-project
+**/*.sublime-workspace
+**/*.o
+**/*.d
+**/build/
+**/*.temp

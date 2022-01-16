@@ -1,0 +1,262 @@
+[- TZN Architecture Overview, Revision 1 -]
+
+-- To Reader --
+
+  All integers without prefix are in base 10
+  Integers prefixed with '0x' are in base 16
+
+  [low high] notation represents little endian byte sequences
+
+  By conventions escape sequences start with [0x1B 0x02]
+
+
+-- Memory Layout --
+
+  0x0000 - 0x007F -- DCC and Device Registers
+  0x0080 - 0x00FF -- Reserved
+  0x0100 - 0xFFFF -- Random Access Memory
+
+  Reading from and writing to memory below RAM is undefined, use device read and device write instructions instead
+
+
+-- Registers --
+
+  There's 9 registers available, all of which are 8 bit
+  Last three (Flags and Program Counter) are reserved for CPU, others are general purpose, but have different capabilities
+
+  Here's the list of usages for each register
+  General:
+    0 -- A -- Accumulator / Address Low / Result
+    1 -- B -- Data / Address High
+    2 -- C -- Data / Counter
+    3 -- D -- Data / Device Address
+  Stack:
+    4 -- L -- Data / Stack Pointer Low
+    5 -- H -- Data / Stack Pointer High
+  Status:
+    6 -- S -- Overflow / Underflow / Equality
+  PC:
+    7 -- CL -- Program Counter Low
+    8 -- CH -- Program Counter High
+
+  On startup it's guaranteed that all register will have 0x00 stored in them except CL that has 0x0100 value to start execution at
+
+  Design allows more for registers, but new instructions must be implemented to utilize them, check devices for availability
+
+
+-- Standard Instructions --
+
+  0x00 -- Move 0 to A
+  0x01 -- Push immediate byte to A
+
+  0x02 -- Increment A, sets S to 0x01 on overflow and 0x00 otherwise
+  0x03 -- Decrement A, sets S to 0x01 on underflow and 0x00 otherwise
+
+  xxxx -- Increment [A B] registers treating them as word, sets S to 0x01 on overflow and 0x00 otherwise
+  xxxx -- Decrement [A B] registers treating them as word, sets S to 0x01 on underflow and 0x00 otherwise
+
+  xxxx -- Flip S register bitwise
+
+  0x04 -- Add immediate byte to A, sets S to 0x01 on overflow and 0x00 otherwise
+  0x05 -- Add contents of B to A, sets S to 0x01 on overflow and 0x00 otherwise
+
+  0x06 -- Subtract immediate byte from A, sets S to 0x01 on underflow and 0x00 otherwise
+  0x07 -- Subtract contents of B from A, sets S to 0x01 on underflow and 0x00 otherwise
+
+  0x08 -- Multiply A by immediate byte, sets S to 0x01 on overflow and 0x00 otherwise
+  0x09 -- Multiply A by contents of B, sets S to 0x01 on overflow and 0x00 otherwise
+
+  0x0A -- Integer division of A by immediate byte
+  0x0B -- Integer division of A by contents of B
+
+  0x0A -- Modulo division of A by immediate byte
+  0x0B -- Modulo division of A by contents of B
+
+  0x0C -- Equality comparison of A with immediate byte, status register is set to 0x01 when they're equal and 0x00 otherwise
+  0x0C -- Equality comparison of A and B, status register is set to 0x01 when they're equal and 0x00 otherwise
+
+  0x0E -- Greater than comparison of A and B, status register is set to 0x01 when A is greater than B and 0x00 otherwise
+
+  0x20 -- Move A to B
+  0x21 -- Move A to C
+  0x21 -- Move A to D
+  0x23 -- Move A to L
+  0x24 -- Move A to H
+  xxxx -- Move A to S
+  xxxx -- Move memory at [A B] to A
+
+  0x25 -- Move B to A
+  0x26 -- Move C to A
+  0x26 -- Move D to A
+  0x28 -- Move L to A
+  0x29 -- Move H to A
+  xxxx -- Move S to A
+
+  xxxx -- Move A to an absolute address from immediate bytes
+  0x2A -- Move A to an absolute address that is composed from [A B] registers
+
+  xxxx -- Read A from an absolute address from immediate bytes
+  0x2E -- Read A from an absolute address that is composed from [A B] registers
+
+  xxxx -- Unconditional jump to an absolute address from immediate bytes
+  0x32 -- Unconditional jump to an absolute address that is composed from [A B] registers
+
+  xxxx -- Conditional jump on S register == 0x01 to an absolute address from immediate bytes
+  0x36 -- Conditional jump on S register == 0x01 to an absolute address that is composed from [A B] registers
+
+  0x3B -- Unconditional relative jump by immediate byte, value treated as signed
+  0x3A -- Unconditional relative jump by A register, value treated as signed
+
+  0x3B -- Conditional relative jump on S register == 0x01 by immediate byte, value treated as signed
+  0x3A -- Conditional relative jump on S register == 0x01 by contents of A register, value treated as signed
+
+  xxxx -- Push B to stack, decrementing the [L H] registers
+  xxxx -- Pull from stack to B, incrementing the [L H] registers
+
+  xxxx -- Jump to subroutine from immediate absolute address, while storing position of next instruction into the [L H] registers
+  xxxx -- Jump to subroutine from address composed from [A B] registers, while storing position of next instruction into the [L H] registers
+
+  xxxx -- Return from subroutine by jumping to address stored at [L H] registers after decrementing the stack pointer
+
+  xxxx -- Device write where contents of D is a device address and immediate byte is sent
+  0x40 -- Device write where contents of D is a device address and A is sent
+  0x40 -- Device write where contents of D is a device address and memory at [A B] is sent
+
+  0x41 -- Device read where contents of D is a device address and A is result
+  0x41 -- Device read where contents of D is a device address and [A B] is address to store the result
+
+
+  TO-CONSIDER
+    -- Native way of looping with specifying the predicate instruction
+    -- Device interrupts for escaping the loops in device driven logic
+       For example, while writing string you might not need to compare with 0x00 in the program and expect that device itself will tell when to stop 
+
+
+-- Device Overview --
+
+  TZN platform is driven by flexible device system that allows to run programs on pretty much any hardware
+  To get available devices and communicate with them you need to rely on Device Control Chip (abbreviated as DCC)
+  It's register address is 0x007F and it's available for both writing and reading
+
+  Multibyte values are little endian
+
+  Every device has id which is represented by null terminated string
+  Standard devices reserve some names, but otherwise they could be used by vendors to implement specific device identifications
+
+
+-- Standard Devices --
+
+  Important note: standard devices only guarantee to respond to cpu in specified manner, but external effects of commands aren't guaranteed
+  You can be sure that anything on which program execution is dependent will be the same between implementations, but not effect that come from devices themselves
+  For example, cursor visibility setting of terminal might not change anything on user screen
+
+
+  "trm"
+    One of the most reliably available devices for user communication, if "trm-chmp" device available it could even by used for graphics drawing
+    On startup cursor is visible and it's position is at (0, 0)
+    There's no guarantee on the size of terminal display nor a way to set it, which is deliberate choice for the sake of portability
+    By convention default character set is ASCII
+
+    Commands:
+      0x00 -- Reset
+      0x10 -- Set cursor horizontal position, follow with 1 byte
+      0x11 -- Set cursor vertical position, follow with 1 byte
+      0x12 -- Set cursor visibility, follow with 1 byte, bool
+      0x13 -- Put character at cursor position and then move it forward, follow with 1 byte representing character
+      0x14 -- Put terminal into string output mode. Every sequential write will be interpreted as 0x13 put character command until 0x00 is encountered
+              Implementations are free to update screen only after string was delivered or on each character
+      0x20 -- Respond with display size, followed by 2 bytes, first byte is horizontal size, second byte is vertical
+      0x21 -- Respond with character at given position
+              Position is encoded by 2 bytes (horizontal, vertical) followed after initial 0x20 byte
+              After that device responds with character byte
+
+      TO-CONSIDER
+        Optional specification of color attributes akin to VGA / VESA text mode
+        Tho probably quite limited, for example, without guarantee that colors will mean something specific, but rather that they will try to be distinct
+
+
+  "trm-chmp"
+    Memory chip containing glyph and palette data used by "term" device
+    Could be used for implementing custom fonts or graphics for extended ascii characters (past 0x7f)
+
+    TODO
+
+
+  "kbt"
+    Text keyboard which output corresponds to ascii characters (if possible)
+    If keys do not correspond to ascii character then escape sequence with null string denoting key content is emitted, but only if there's enough space in buffer for it available
+    0 value is reserved for signaling no press available
+    Reading from this device will pop first value from key buffer
+    Writing to this device's port will put values into its buffer at the end as if they were pressed, on overflow nothing will happen
+
+    *It's guaranteed that internal key buffer is at least 256 bytes long
+    *You can't rely on writing escape sequences into the keyboard buffer manually as it could be interrupted by keyboard itself writing at the same time
+
+
+  "pms"
+    Plain mouse device
+
+    Commands:
+      0x00 -- Reset
+      0x10 -- Respond with horizontal position, followed by 2 bytes
+      0x11 -- Respond with vertical position, followed by 2 bytes
+      0x20 -- Respond with press status of button 1, followed by 1 byte, bool
+      0x21 -- Respond with press status of button 2, followed by 1 byte, bool
+      0x22 -- Respond with press status of button 3, followed by 1 byte, bool
+      0x23 -- Respond with scroll status of wheel button, followed by 1 byte (0x00 for no scroll, 0x01 for up, 0x02 for down)
+
+
+  "drv"
+    Minimalist external memory device which might be used for writing or reading
+    It's guaranteed that its memory is persistent between power downs
+
+    Commands:
+      TODO
+
+
+  "ram"
+    External RAM device that could be used for extension of TZN capabilities
+    As it only has 16 bit data bus - initial RAM is rather limited, especially for programs that need graphics, audio or other data
+    Such device might allow streaming on demand, even for executing code
+
+    Commands:
+      TODO
+
+
+  "clc"
+    Standard clock
+    It is wrapping every 65535 milliseconds or ~65 seconds as counter only has 2 byte resolution
+    Its counter on startup is equal to 0x0000
+
+    Commands:
+      0x00 -- Reset
+      0x01 -- Respond with counter, followed by 2 bytes representing milliseconds
+
+
+  "osc"
+    Simplistic oscillator ("beeper") device
+
+    Commands:
+      TODO
+
+
+-- DCC Command Sequences --
+
+  0x00 -- Reset
+    Clears DCC message buffer and resets all logic as it was on startup
+
+  0x01 -- Search device
+    Puts DCC into device searching sequence
+    It will treat every following byte as character in device id to search until 0x00 (null) is encountered
+    Then 2 bytes pushed to buffer to be read containing the device address or 0 value to signal failure
+    *It's guaranteed that device searching buffer is at least 8 bytes long, last null character will not be placed in there
+
+  0x02 -- List devices
+    Makes DCC output every device name available by sending bytes of null strings
+    When empty string is passed - no more devices are available
+    If you're searching for a particular device and found, but don't want to exhaust full output then write 0x00 reset byte to DCC
+
+
+-- Why CISC? --
+  Mostly for resulting in more human readable, "declarative" assembly
+  Also in memory and register count restricted environment it's more beneficial
