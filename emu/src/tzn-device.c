@@ -4,11 +4,14 @@
 #include "tzn-terminal.h"
 #endif
 
+#include "tzn-controller.h"
+
 enum {
   dvNone,
 #ifdef TZN_HAS_TERMINAL
-  dvTerminal
+  dvTerminal,
 #endif
+  dvController,
 };
 
 TZN_UNLIKELY
@@ -30,14 +33,20 @@ tzn_DeviceWrite(U8 byte, U8 device)
     case dvTerminal:
     {
       tzn_TerminalWrite(byte);
-      break;
+      return;
     }
 #endif
+    case dvController:
+    {
+      tzn_ControllerWrite(byte);
+      return;
+    }
     default:
     {
       tzn_Error("invalid device"); /* TEMP */
     }
   }
+  TZN_UNREACHABLE();
 }
 
 TZN_LIKELY
@@ -52,6 +61,10 @@ tzn_DeviceRead(U8 device)
       return tzn_TerminalRead();
     }
 #endif
+    case dvController:
+    {
+      return tzn_ControllerRead();
+    }
     default:
     {
       tzn_Error("invalid device"); /* TEMP */

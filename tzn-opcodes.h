@@ -19,7 +19,7 @@ enum {
   MOVMA,  /* Move memory at [A B] to A */
 
   INCA,   /* Increment A, sets S to 0x01 on overflow */
-  INCAB,  /* Increment A B as word, sets S to 0x01 on overflow */
+  INCBC,  /* Increment A B as word, sets S to 0x01 on overflow */
 
   DECA,   /* Decrement A, sets S to 0x01 on underflow */
   DECAB,  /* Decrement A B as word, sets S to 0x01 on underflow */

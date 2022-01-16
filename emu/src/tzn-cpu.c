@@ -9,6 +9,14 @@ static U8 memory[TZN_MEMORY_BYTES];
 enum { rgA, rgB, rgC, rgD, rgL, rgH };
 
 void
+tzn_Restart(void)
+{
+  U16 idx = TZN_MEMORY_BYTES;
+  while (idx--)
+    memory[idx] = 0;
+}
+
+void
 tzn_WriteMemory(const U8* to_cpy, U16 offset, U16 size)
 {
   TZN_ASSERT(((U32)offset + (U32)size) < (U32)TZN_MEMORY_BYTES, "memory write past RAM size");
@@ -28,6 +36,9 @@ tzn_Exec(void)
   register U16 program_counter = TZN_MEMORY_RAM_START;
   U8 registers[TZN_GENERAL_REGISTER_COUNT] = {0};
   U8 status_register;
+
+  registers[rgL] = U16_LOW(TZN_STARTUP_STACK_POINTER_VALUE);
+  registers[rgH] = U16_HIGH(TZN_STARTUP_STACK_POINTER_VALUE);
 
   while (1)
   {
@@ -104,7 +115,7 @@ tzn_Exec(void)
       }
       case MOVMA:
       {
-        registers[rgA] = memory[COMPOSE_U16(registers[rgA], registers[rgB])];
+        registers[rgA] = memory[U16_COMPOSE(registers[rgB], registers[rgC])];
         break;
       }
       case INCA:
@@ -119,24 +130,18 @@ tzn_Exec(void)
         status_register = registers[rgA] == U8_MAX;
         break;
       }
-      case INCAB:
+      case INCBC:
       {
-        registers[rgA]++;
-        if (registers[rgA] == U8_MIN) {
-          registers[rgB]++;
-          status_register = registers[rgB] == U8_MIN;
-        }
+        if (++registers[rgB] == U8_MIN)
+          status_register = ++registers[rgC] == U8_MIN;
         else
           status_register = 0x00;
         break;
       }
       case DECAB:
       {
-        registers[rgA]--;
-        if (registers[rgA] == U8_MAX) {
-          registers[rgB]--;
-          status_register = registers[rgB] == U8_MAX;
-        }
+        if (--registers[rgB] == U8_MAX)
+          status_register = --registers[rgC] == U8_MAX;
         else
           status_register = 0x00;
         break;
@@ -212,7 +217,7 @@ tzn_Exec(void)
       }
       case DVWM:
       {
-        tzn_DeviceWrite(memory[COMPOSE_U16(registers[rgA], registers[rgB])], registers[rgD]);
+        tzn_DeviceWrite(memory[U16_COMPOSE(registers[rgB], registers[rgC])], registers[rgD]);
         break;
       }
       case DVR:
@@ -225,4 +230,5 @@ tzn_Exec(void)
       }
     }
   }
+  TZN_UNREACHABLE();
 }

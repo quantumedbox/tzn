@@ -3,6 +3,10 @@
 
 static U8 terminal_state;
 
+/* Used as temporary for character getting */
+static U8 lookup_x;
+static U8 lookup_y;
+
 enum {
   tsNone,
   tsWaitSetCursorHorizontalPos,
@@ -11,7 +15,7 @@ enum {
   tsWaitPutCharacter,
   tsWaitPutString,
   tsSendDisplayWidth,
-  tsSendDesplayHeight,
+  tsSendDisplayHeight,
   tsGetCharWaitHorizontalPos,
   tsGetCharWaitVerticalPos,
   tsGetCharSendChar,
@@ -28,7 +32,7 @@ tzn_TerminalWrite(U8 byte)
 
   switch (terminal_state) {
 
-    /* Initialize sequence */
+    /* Start command sequence */
     case tsNone:
     {
       switch (byte)
@@ -36,30 +40,41 @@ tzn_TerminalWrite(U8 byte)
         case TERMINAL_SET_CURSOR_HORIZONTRAL:
         {
           terminal_state = tsWaitSetCursorHorizontalPos;
-          break;
+          return;
         }
         case TERMINAL_SET_CURSOR_VERTICAL:
         {
           terminal_state = tsWaitSetCursorVerticalPos;
-          break;
+          return;
         }
         case TERMINAL_SET_CURSOR_VISIBILITY:
         {
           terminal_state = tsWaitSetCursorVisibility;
-          break;
+          return;
         }
         case TERMINAL_PUT_CHAR:
         {
           terminal_state = tsWaitPutCharacter;
-          break;
+          return;
         }
         case TERMINAL_PUT_STRING:
         {
           terminal_state = tsWaitPutString;
-          break;
+          return;
         }
+        case TERMINAL_GET_DISPLAY_SIZE:
+        {
+          terminal_state = tsSendDisplayWidth;
+          return;
+        }
+        case TERMINAL_GET_CHAR:
+        {
+          terminal_state = tsGetCharWaitHorizontalPos;
+          return;
+        }
+        default:
+          return;
       }
-      break;
     }
 
     /* Set cursor horizontal pos */
@@ -67,7 +82,7 @@ tzn_TerminalWrite(U8 byte)
     {
       tzn_TerminalSetCursorHorizontalPos(byte);
       terminal_state = tsNone;
-      break;
+      return;
     }
 
     /* Set cursor vertical pos */
@@ -75,7 +90,7 @@ tzn_TerminalWrite(U8 byte)
     {
       tzn_TerminalSetCursorVerticalPos(byte);
       terminal_state = tsNone;
-      break;
+      return;
     }
 
     /* Print character at cursor position, move cursor forward */
@@ -83,7 +98,7 @@ tzn_TerminalWrite(U8 byte)
     {
       tzn_TerminalSetCursorVisibility(byte);
       terminal_state = tsNone;
-      break;
+      return;
     }
 
     /* Print character at cursor position, move cursor forward */
@@ -91,14 +106,30 @@ tzn_TerminalWrite(U8 byte)
     {
       tzn_TerminalPutChar(byte);
       terminal_state = tsNone;
-      break;
+      return;
     }
 
     /* Print character at cursor position, move cursor forward, wait next character of 0x00 to stop */
     case tsWaitPutString:
     {
       tzn_TerminalPutChar(byte);
-      break;
+      return;
+    }
+
+    /* Set temporary for x position, await to send y position */
+    case tsGetCharWaitHorizontalPos:
+    {
+      lookup_x = byte;
+      terminal_state = tsGetCharWaitVerticalPos;
+      return;
+    }
+
+    /* Set temporary for y position, await reading of char */
+    case tsGetCharWaitVerticalPos:
+    {
+      lookup_y = byte;
+      terminal_state = tsGetCharSendChar;
+      return;
     }
 
     default:
@@ -106,6 +137,7 @@ tzn_TerminalWrite(U8 byte)
       tzn_Error("invalid terminal state"); /* TEMP */
     }
   }
+  TZN_UNREACHABLE();
 }
 
 TZN_UNLIKELY
@@ -114,9 +146,30 @@ tzn_TerminalRead(void)
 {
   switch (terminal_state) {
 
+    /* Send display width, await to send height */
+    case tsSendDisplayWidth:
+    {
+      terminal_state = tsSendDisplayHeight;
+      return tzn_terminal_width;
+    }
+
+    /* Send display height, end command sequence */
+    case tsSendDisplayHeight:
+    {
+      terminal_state = tsNone;
+      return tzn_terminal_height;
+    }
+
+    /* Send character at previously specified position, end command sequence */
+    case tsGetCharSendChar:
+    {
+      terminal_state = tsNone;
+      return tzn_TerminalGetChar(lookup_x, lookup_y);
+    }
 
     /* If terminal doesn't expect reading it returns zero byte */
     default:
       return 0x00;
   }
+  TZN_UNREACHABLE();
 }

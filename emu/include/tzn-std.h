@@ -65,9 +65,13 @@ TZN_UNLIKELY TZN_NORETURN void tzn_Error(const char* literal);
 #endif
 
 #if TZN_IS_LITTLE_ENDIAN == 1
-  #define COMPOSE_U16(low, high) (((U16)high << 8) | (U16)low)
+  #define U16_COMPOSE(low, high) (((U16)high << 8) | (U16)low)
+  #define U16_LOW(v) (v >> 8)
+  #define U16_HIGH(v) (v & 0x0F)
 #else
-  #define COMPOSE_U16(low, high) (((U16)low << 8) | (U16)high)
+  #define U16_COMPOSE(low, high) (((U16)low << 8) | (U16)high)
+  #define U16_LOW(v) (v & 0x0F)
+  #define U16_HIGH(v) (v >> 8)
 #endif
 
 #endif

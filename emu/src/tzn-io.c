@@ -3,7 +3,7 @@
 
 #include "tzn-std.h"
 
-/* Abstract IO operations for portability on various libc implementations (Plan 9 for example) */
+/* TODO Abstract IO operations for portability on various libc implementations (Plan 9 for example) */
 
 TZN_UNLIKELY
 TZN_NORETURN

@@ -24,24 +24,25 @@
   There's 9 registers available, all of which are 8 bit
   Last three (Flags and Program Counter) are reserved for CPU, others are general purpose, but have different capabilities
 
-  Here's the list of usages for each register
-  General:
-    0 -- A -- Accumulator / Address Low / Result
-    1 -- B -- Data / Address High
-    2 -- C -- Data / Counter
-    3 -- D -- Data / Device Address
-  Stack:
-    4 -- L -- Data / Stack Pointer Low
-    5 -- H -- Data / Stack Pointer High
-  Status:
-    6 -- S -- Overflow / Underflow / Equality
-  PC:
-    7 -- CL -- Program Counter Low
-    8 -- CH -- Program Counter High
+  Here's the list of intended usages for each register:
+    General:
+      0 -- A -- Accumulator / Result
+      1 -- B -- Address Low / Counter
+      2 -- C -- Address High / Counter
+      3 -- D -- Device Address
+    Stack:
+      4 -- L -- Stack Pointer Low
+      5 -- H -- Stack Pointer High
+    Status:
+      6 -- S -- Overflow / Underflow / Equality
+    PC:
+      7 -- CL -- Program Counter Low
+      8 -- CH -- Program Counter High
 
-  On startup it's guaranteed that all register will have 0x00 stored in them except CL that has 0x0100 value to start execution at
-
-  Design allows more for registers, but new instructions must be implemented to utilize them, check devices for availability
+  *On startup it's guaranteed that A B C D S registers will all have 0x00 stored
+  *On startup it's guaranteed that [C L] will have 0x0100 value to start execution at
+  *On startup it's guaranteed that [L H] will have highest point in RAM (0xFFFF)
+  *Design allows more for registers, but new instructions must be implemented to utilize them, check devices for availability
 
 
 -- Standard Instructions --
@@ -52,8 +53,8 @@
   0x02 -- Increment A, sets S to 0x01 on overflow and 0x00 otherwise
   0x03 -- Decrement A, sets S to 0x01 on underflow and 0x00 otherwise
 
-  xxxx -- Increment [A B] registers treating them as word, sets S to 0x01 on overflow and 0x00 otherwise
-  xxxx -- Decrement [A B] registers treating them as word, sets S to 0x01 on underflow and 0x00 otherwise
+  xxxx -- Increment [B C] registers treating them as word, sets S to 0x01 on overflow and 0x00 otherwise
+  xxxx -- Decrement [B C] registers treating them as word, sets S to 0x01 on underflow and 0x00 otherwise
 
   xxxx -- Flip S register bitwise
 
@@ -83,7 +84,7 @@
   0x23 -- Move A to L
   0x24 -- Move A to H
   xxxx -- Move A to S
-  xxxx -- Move memory at [A B] to A
+  xxxx -- Move memory at [B C] to A
 
   0x25 -- Move B to A
   0x26 -- Move C to A
@@ -93,16 +94,16 @@
   xxxx -- Move S to A
 
   xxxx -- Move A to an absolute address from immediate bytes
-  0x2A -- Move A to an absolute address that is composed from [A B] registers
+  0x2A -- Move A to an absolute address that is composed from [B C] registers
 
   xxxx -- Read A from an absolute address from immediate bytes
-  0x2E -- Read A from an absolute address that is composed from [A B] registers
+  0x2E -- Read A from an absolute address that is composed from [B C] registers
 
   xxxx -- Unconditional jump to an absolute address from immediate bytes
-  0x32 -- Unconditional jump to an absolute address that is composed from [A B] registers
+  0x32 -- Unconditional jump to an absolute address that is composed from [B C] registers
 
   xxxx -- Conditional jump on S register == 0x01 to an absolute address from immediate bytes
-  0x36 -- Conditional jump on S register == 0x01 to an absolute address that is composed from [A B] registers
+  0x36 -- Conditional jump on S register == 0x01 to an absolute address that is composed from [B C] registers
 
   0x3B -- Unconditional relative jump by immediate byte, value treated as signed
   0x3A -- Unconditional relative jump by A register, value treated as signed
@@ -114,16 +115,16 @@
   xxxx -- Pull from stack to B, incrementing the [L H] registers
 
   xxxx -- Jump to subroutine from immediate absolute address, while storing position of next instruction into the [L H] registers
-  xxxx -- Jump to subroutine from address composed from [A B] registers, while storing position of next instruction into the [L H] registers
+  xxxx -- Jump to subroutine from address composed from [B C] registers, while storing position of next instruction into the [L H] registers
 
   xxxx -- Return from subroutine by jumping to address stored at [L H] registers after decrementing the stack pointer
 
   xxxx -- Device write where contents of D is a device address and immediate byte is sent
   0x40 -- Device write where contents of D is a device address and A is sent
-  0x40 -- Device write where contents of D is a device address and memory at [A B] is sent
+  0x40 -- Device write where contents of D is a device address and memory at [B C] is sent
 
   0x41 -- Device read where contents of D is a device address and A is result
-  0x41 -- Device read where contents of D is a device address and [A B] is address to store the result
+  0x41 -- Device read where contents of D is a device address and [B C] is address to store the result
 
 
   TO-CONSIDER
@@ -137,8 +138,6 @@
   TZN platform is driven by flexible device system that allows to run programs on pretty much any hardware
   To get available devices and communicate with them you need to rely on Device Control Chip (abbreviated as DCC)
   It's register address is 0x007F and it's available for both writing and reading
-
-  Multibyte values are little endian
 
   Every device has id which is represented by null terminated string
   Standard devices reserve some names, but otherwise they could be used by vendors to implement specific device identifications
@@ -238,6 +237,17 @@
 
     Commands:
       TODO
+
+
+  "ctr"
+    Power controller that allows stopping or restarting the execution while also providing minimal information about system
+
+    Commands:
+      0x01 -- Shutdown
+      0x02 -- Restart
+
+    TO-CONSIDER
+      -- Battery status command
 
 
 -- DCC Command Sequences --
