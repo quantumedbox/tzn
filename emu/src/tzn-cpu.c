@@ -2,6 +2,7 @@
 
 #include "tzn-cpu.h"
 #include "tzn-std.h"
+#include "tzn-io.h"
 #include "tzn-device.h"
 
 /* TODO Only provide RAM? Not full address range */

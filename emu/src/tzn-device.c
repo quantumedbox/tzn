@@ -1,4 +1,5 @@
 #include "tzn-std.h"
+#include "tzn-io.h"
 
 #ifdef TZN_HAS_TERMINAL
 #include "tzn-terminal.h"
