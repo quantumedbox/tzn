@@ -47,7 +47,7 @@
 
 -- Standard Instructions --
 
-  0x00 -- Move 0 to A
+  0x00 -- Move 0x00 to A
   0x01 -- Push immediate byte to A
 
   0x02 -- Increment A, sets S to 0x01 on overflow and 0x00 otherwise
@@ -56,7 +56,7 @@
   xxxx -- Increment [B C] registers treating them as word, sets S to 0x01 on overflow and 0x00 otherwise
   xxxx -- Decrement [B C] registers treating them as word, sets S to 0x01 on underflow and 0x00 otherwise
 
-  xxxx -- Flip S register bitwise
+  xxxx -- Flip first bit of S register
 
   0x04 -- Add immediate byte to A, sets S to 0x01 on overflow and 0x00 otherwise
   0x05 -- Add contents of B to A, sets S to 0x01 on overflow and 0x00 otherwise

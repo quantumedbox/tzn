@@ -24,10 +24,12 @@ static
 void
 tzn_CpuInit(void)
 {
+  U16 idx;
+
   TZN_ASSERT(init_memory != TZN_VOID, "void pointer for memory initialization, check that you're calling tzn_CpuPassInitMemory()");
   TZN_ASSERT(init_memory_size < TZN_MEMORY_RAM_BYTES, "cannot fit initialization memory");
 
-  U16 idx = 0;
+  idx = 0;
   for (; idx < init_memory_size; idx++)
   {
     memory[TZN_MEMORY_RAM_START + idx] = init_memory[idx];
@@ -47,12 +49,12 @@ TZN_NORETURN
 void
 tzn_CpuExec(void)
 {
-  tzn_CpuInit();
-  tzn_DevicesInit();
-
   register U16 program_counter;
   U8 registers[TZN_GENERAL_REGISTER_COUNT];
   U8 status_register;
+
+  tzn_CpuInit();
+  tzn_DevicesInit();
 
 #define INIT_REGISTER_STATE() { \
     U16 idx = TZN_GENERAL_REGISTER_COUNT; \
@@ -216,19 +218,13 @@ tzn_CpuExec(void)
       case JMPRI:
       {
         U8 rel_addr = memory[program_counter++];
-        if (rel_addr & 0x80)
-          program_counter = (program_counter - (U8)~rel_addr) - 1;
-        else
-          program_counter += rel_addr;
+        U16_SUB_I8(program_counter, rel_addr);
         break;
       }
       case JMPCRI:
       {
         U8 rel_addr = memory[program_counter++] * status_register;
-        if (rel_addr & 0x80)
-          program_counter = (program_counter - (U8)~rel_addr) - 1;
-        else
-          program_counter += rel_addr;
+        U16_SUB_I8(program_counter, rel_addr);
         break;
       }
       case DVWI:

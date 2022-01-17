@@ -76,4 +76,10 @@ TZN_NORETURN void tzn_Error(const char* literal);
   #define U16_HIGH(v) (v >> 8)
 #endif
 
+#define U16_SUB_I8(subtrahend, subtractor) \
+  if (rel_addr & 0x80) \
+    program_counter = (program_counter - (U8)~rel_addr) - 1; \
+  else \
+    program_counter += rel_addr;
+
 #endif

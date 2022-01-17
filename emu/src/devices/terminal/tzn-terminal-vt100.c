@@ -9,7 +9,7 @@
 #define TERMINAL_WIDTH 80
 #define TERMINAL_HEIGHT 25
 
-#define ESCAPE_SEQUENCE "\e["
+#define ESCAPE_SEQUENCE "\033["
 #define HIDE_CURSOR ESCAPE_SEQUENCE "?25l"
 #define SHOW_CURSOR ESCAPE_SEQUENCE "?25h"
 #define CLEAR_SCREEN ESCAPE_SEQUENCE "2J"
@@ -39,13 +39,15 @@ tzn_UpdateCursorPos(void)
 void
 tzn_TerminalInitImpl(void)
 {
+  U16 idx;
+
   terminal_cursor_horizontal_pos = 0;
   terminal_cursor_vertical_pos = 0;
   tzn_UpdateCursorPos();
 
   fputs(CLEAR_SCREEN, stdout);
 
-  U16 idx = TERMINAL_WIDTH * TERMINAL_HEIGHT;
+  idx = TERMINAL_WIDTH * TERMINAL_HEIGHT;
   while (idx--)
     screen_map[idx] = 0;
 }

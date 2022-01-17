@@ -12,7 +12,7 @@ enum {
 #ifdef TZN_HAS_TERMINAL
   dvTerminal,
 #endif
-  dvController,
+  dvController
 };
 
 /* Initializing is setting devices up in their startup state */

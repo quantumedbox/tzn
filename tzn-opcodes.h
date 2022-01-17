@@ -42,7 +42,7 @@ enum {
   DVWA,   /* Device write from A where D is device register */
   DVWM,   /* Device write from memory at [A B] where D is device register */
 
-  DVR,    /* Device read to A where D is device register */
+  DVR     /* Device read to A where D is device register */
 };
 
 #endif

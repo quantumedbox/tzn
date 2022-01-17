@@ -29,7 +29,7 @@ enum {
   tsSendDisplayHeight,
   tsGetCharWaitHorizontalPos,
   tsGetCharWaitVerticalPos,
-  tsGetCharSendChar,
+  tsGetCharSendChar
 };
 
 void
