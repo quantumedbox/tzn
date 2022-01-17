@@ -5,8 +5,14 @@
 
 #include "tzn-std.h"
 #include "tzn-cpu.h"
+#include "tzn-device.h"
 
-TZN_UNLIKELY
+void
+tzn_ControllerInitImpl(void)
+{
+  /* Empty */
+}
+
 TZN_NORETURN
 void
 tzn_ControllerShutdown(void)
@@ -16,11 +22,10 @@ tzn_ControllerShutdown(void)
 
 /* TODO We probably need to ensure that nested resets do not cause stack growth */
 /* It would probably be better to have CPU signaling ability for that to modify existing loop without invoking new one */
-TZN_UNLIKELY
-TZN_NORETURN
+/* TODO Reset device state */
+
 void
 tzn_ControllerReset(void)
 {
   tzn_Restart();
-  tzn_Exec();
 }

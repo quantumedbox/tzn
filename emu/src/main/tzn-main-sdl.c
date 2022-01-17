@@ -40,7 +40,7 @@ main(void)
   };
 
   tzn_WriteMemory(test_code, TZN_MEMORY_RAM_START, sizeof test_code);
-  tzn_Exec();
+  tzn_CpuExec();
 
   /*
   if (SDL_Init(SDL_INIT_VIDEO))

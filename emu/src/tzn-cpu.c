@@ -4,41 +4,67 @@
 #include "tzn-std.h"
 #include "tzn-device.h"
 
+/* TODO Only provide RAM? Not full address range */
 static U8 memory[TZN_MEMORY_BYTES];
+static U8 should_restart;
+
+/* Passed externally, should outlive next tzn_CpuExec call which depends on it */
+static const U8* init_memory = TZN_VOID;
+static U16 init_memory_size;
 
 enum { rgA, rgB, rgC, rgD, rgL, rgH };
 
 void
 tzn_Restart(void)
 {
-  U16 idx = TZN_MEMORY_BYTES;
-  while (idx--)
-    memory[idx] = 0;
+  should_restart = 1;
 }
 
+static
 void
-tzn_WriteMemory(const U8* to_cpy, U16 offset, U16 size)
+tzn_CpuInit(void)
 {
-  TZN_ASSERT(((U32)offset + (U32)size) < (U32)TZN_MEMORY_BYTES, "memory write past RAM size");
+  TZN_ASSERT(init_memory != TZN_VOID, "void pointer for memory initialization, check that you're calling tzn_CpuPassInitMemory()");
+  TZN_ASSERT(init_memory_size < TZN_MEMORY_RAM_BYTES, "cannot fit initialization memory");
 
   U16 idx = 0;
-  for (; idx < size; idx++)
+  for (; idx < init_memory_size; idx++)
   {
-    memory[offset + idx] = to_cpy[idx];
+    memory[TZN_MEMORY_RAM_START + idx] = init_memory[idx];
   }
 }
 
 void
-tzn_Exec(void)
+tzn_CpuPassInitMemory(const U8* mem, U16 size)
 {
+  TZN_ASSERT(size < TZN_MEMORY_RAM_BYTES, "cannot fit initialization memory");
+
+  init_memory = mem;
+  init_memory_size = size;
+}
+
+TZN_NORETURN
+void
+tzn_CpuExec(void)
+{
+  tzn_CpuInit();
   tzn_DevicesInit();
 
-  register U16 program_counter = TZN_MEMORY_RAM_START;
-  U8 registers[TZN_GENERAL_REGISTER_COUNT] = {0};
+  register U16 program_counter;
+  U8 registers[TZN_GENERAL_REGISTER_COUNT];
   U8 status_register;
 
-  registers[rgL] = U16_LOW(TZN_STARTUP_STACK_POINTER_VALUE);
-  registers[rgH] = U16_HIGH(TZN_STARTUP_STACK_POINTER_VALUE);
+#define INIT_REGISTER_STATE() { \
+    U16 idx = TZN_GENERAL_REGISTER_COUNT; \
+    while (idx--) \
+      registers[idx] = 0x00; \
+    program_counter = TZN_MEMORY_RAM_START; \
+    status_register = 0x00; \
+    registers[rgL] = U16_LOW(TZN_STARTUP_STACK_POINTER_VALUE); \
+    registers[rgH] = U16_HIGH(TZN_STARTUP_STACK_POINTER_VALUE); \
+  }
+
+  INIT_REGISTER_STATE();
 
   while (1)
   {
@@ -229,6 +255,12 @@ tzn_Exec(void)
         tzn_Error("instruction not implemented");
       }
     }
+    if (should_restart) {
+      tzn_CpuInit();
+      tzn_DevicesInit();
+      INIT_REGISTER_STATE();
+      should_restart = 0;
+    }
   }
-  TZN_UNREACHABLE();
+#undef INIT_REGISTER_STATE
 }

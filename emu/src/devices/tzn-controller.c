@@ -1,6 +1,15 @@
 #include "tzn-controller.h"
 
-TZN_UNLIKELY
+extern void tzn_ControllerInitImpl(void);
+extern TZN_NORETURN void tzn_ControllerShutdown(void);
+extern void tzn_ControllerReset(void);
+
+void
+tzn_ControllerInit(void)
+{
+  tzn_ControllerInitImpl();
+}
+
 void
 tzn_ControllerWrite(U8 byte)
 {
@@ -19,10 +28,8 @@ tzn_ControllerWrite(U8 byte)
       return;
     }
   }
-  TZN_UNREACHABLE();
 }
 
-TZN_UNLIKELY
 U8
 tzn_ControllerRead(void)
 {

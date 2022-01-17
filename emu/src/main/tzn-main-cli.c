@@ -35,8 +35,8 @@ U8 test[] = {
 int
 main(void)
 {
-  tzn_WriteMemory(test, TZN_MEMORY_RAM_START, sizeof test);
-  tzn_Exec();
+  tzn_CpuPassInitMemory(test, sizeof test);
+  tzn_CpuExec();
 
   return 0;
 }

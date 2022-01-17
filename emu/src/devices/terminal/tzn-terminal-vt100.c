@@ -19,7 +19,7 @@ const U8 tzn_terminal_height = TERMINAL_HEIGHT;
 
 static U8 terminal_cursor_horizontal_pos;
 static U8 terminal_cursor_vertical_pos;
-// static U8 terminal_cursor_visibility;
+/* static U8 terminal_cursor_visibility; */
 
 static U8 screen_map[TERMINAL_WIDTH * TERMINAL_HEIGHT];
 
@@ -36,12 +36,18 @@ tzn_UpdateCursorPos(void)
   );
 }
 
-TZN_UNLIKELY
 void
-tzn_TerminalInit(void)
+tzn_TerminalInitImpl(void)
 {
+  terminal_cursor_horizontal_pos = 0;
+  terminal_cursor_vertical_pos = 0;
   tzn_UpdateCursorPos();
+
   fputs(CLEAR_SCREEN, stdout);
+
+  U16 idx = TERMINAL_WIDTH * TERMINAL_HEIGHT;
+  while (idx--)
+    screen_map[idx] = 0;
 }
 
 void

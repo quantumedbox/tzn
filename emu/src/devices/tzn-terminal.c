@@ -7,6 +7,17 @@ static U8 terminal_state;
 static U8 lookup_x;
 static U8 lookup_y;
 
+/* Implementation dependent functions, compile against something that implements them */
+extern void tzn_TerminalInitImpl(void);
+extern void tzn_TerminalSetCursorHorizontalPos(U8 pos);
+extern void tzn_TerminalSetCursorVerticalPos(U8 pos);
+extern void tzn_TerminalSetCursorVisibility(U8 state);
+extern TZN_LIKELY void tzn_TerminalPutChar(U8 ch);
+extern U8 tzn_TerminalGetChar(U8 horizontal, U8 vertical);
+
+extern U8 tzn_terminal_width;
+extern U8 tzn_terminal_height;
+
 enum {
   tsNone,
   tsWaitSetCursorHorizontalPos,
@@ -21,6 +32,13 @@ enum {
   tsGetCharSendChar,
 };
 
+void
+tzn_TerminalInit(void)
+{
+  terminal_state = tsNone;
+  tzn_TerminalInitImpl();
+}
+
 TZN_LIKELY
 void
 tzn_TerminalWrite(U8 byte)
@@ -32,7 +50,7 @@ tzn_TerminalWrite(U8 byte)
 
   switch (terminal_state) {
 
-    /* Start command sequence */
+    /* Expecting to start new command sequence */
     case tsNone:
     {
       switch (byte)
@@ -40,41 +58,40 @@ tzn_TerminalWrite(U8 byte)
         case TERMINAL_SET_CURSOR_HORIZONTRAL:
         {
           terminal_state = tsWaitSetCursorHorizontalPos;
-          return;
+          break;
         }
         case TERMINAL_SET_CURSOR_VERTICAL:
         {
           terminal_state = tsWaitSetCursorVerticalPos;
-          return;
+          break;
         }
         case TERMINAL_SET_CURSOR_VISIBILITY:
         {
           terminal_state = tsWaitSetCursorVisibility;
-          return;
+          break;
         }
         case TERMINAL_PUT_CHAR:
         {
           terminal_state = tsWaitPutCharacter;
-          return;
+          break;
         }
         case TERMINAL_PUT_STRING:
         {
           terminal_state = tsWaitPutString;
-          return;
+          break;
         }
         case TERMINAL_GET_DISPLAY_SIZE:
         {
           terminal_state = tsSendDisplayWidth;
-          return;
+          break;
         }
         case TERMINAL_GET_CHAR:
         {
           terminal_state = tsGetCharWaitHorizontalPos;
-          return;
+          break;
         }
-        default:
-          return;
       }
+      break;
     }
 
     /* Set cursor horizontal pos */
@@ -82,7 +99,7 @@ tzn_TerminalWrite(U8 byte)
     {
       tzn_TerminalSetCursorHorizontalPos(byte);
       terminal_state = tsNone;
-      return;
+      break;
     }
 
     /* Set cursor vertical pos */
@@ -90,7 +107,7 @@ tzn_TerminalWrite(U8 byte)
     {
       tzn_TerminalSetCursorVerticalPos(byte);
       terminal_state = tsNone;
-      return;
+      break;
     }
 
     /* Print character at cursor position, move cursor forward */
@@ -98,7 +115,7 @@ tzn_TerminalWrite(U8 byte)
     {
       tzn_TerminalSetCursorVisibility(byte);
       terminal_state = tsNone;
-      return;
+      break;
     }
 
     /* Print character at cursor position, move cursor forward */
@@ -106,14 +123,14 @@ tzn_TerminalWrite(U8 byte)
     {
       tzn_TerminalPutChar(byte);
       terminal_state = tsNone;
-      return;
+      break;
     }
 
     /* Print character at cursor position, move cursor forward, wait next character of 0x00 to stop */
     case tsWaitPutString:
     {
       tzn_TerminalPutChar(byte);
-      return;
+      break;
     }
 
     /* Set temporary for x position, await to send y position */
@@ -121,7 +138,7 @@ tzn_TerminalWrite(U8 byte)
     {
       lookup_x = byte;
       terminal_state = tsGetCharWaitVerticalPos;
-      return;
+      break;
     }
 
     /* Set temporary for y position, await reading of char */
@@ -129,18 +146,11 @@ tzn_TerminalWrite(U8 byte)
     {
       lookup_y = byte;
       terminal_state = tsGetCharSendChar;
-      return;
-    }
-
-    default:
-    {
-      tzn_Error("invalid terminal state"); /* TEMP */
+      break;
     }
   }
-  TZN_UNREACHABLE();
 }
 
-TZN_UNLIKELY
 U8
 tzn_TerminalRead(void)
 {
@@ -167,9 +177,11 @@ tzn_TerminalRead(void)
       return tzn_TerminalGetChar(lookup_x, lookup_y);
     }
 
-    /* If terminal doesn't expect reading it returns zero byte */
+    /*
+      If terminal doesn't expect reading it returns zero byte
+      TODO But at the same time nothing says it should? Maybe we could specify that 0x00 is expected to be read
+    */
     default:
       return 0x00;
   }
-  TZN_UNREACHABLE();
 }

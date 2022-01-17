@@ -4,6 +4,8 @@
 #include "tzn-types.h"
 #include "tzn-limits.h"
 
+#define TZN_VOID ((void*)0)
+
 #ifndef TZN_IS_LITTLE_ENDIAN
   #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || \
       defined(__BIG_ENDIAN__) || \
@@ -42,7 +44,7 @@
   @brief  Print null terminated string holding error message and then exit
   @warn   Preferably only const literals should be passed here, don't mess with null strings
 */
-TZN_UNLIKELY TZN_NORETURN void tzn_Error(const char* literal);
+TZN_NORETURN void tzn_Error(const char* literal);
 
 #ifdef TZN_DEBUG
   #define TZN_ASSERT(cond, literal) do { if (!(cond)) tzn_Error(literal); } while (0)

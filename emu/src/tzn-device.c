@@ -6,6 +6,7 @@
 
 #include "tzn-controller.h"
 
+/* Ports are dependent on availability of devices, no assumptions should be made about their order */
 enum {
   dvNone,
 #ifdef TZN_HAS_TERMINAL
@@ -14,13 +15,14 @@ enum {
   dvController,
 };
 
-TZN_UNLIKELY
+/* Initializing is setting devices up in their startup state */
 void
 tzn_DevicesInit(void)
 {
 #ifdef TZN_HAS_TERMINAL
   tzn_TerminalInit();
 #endif
+  tzn_ControllerInit();
 }
 
 TZN_LIKELY
@@ -33,20 +35,19 @@ tzn_DeviceWrite(U8 byte, U8 device)
     case dvTerminal:
     {
       tzn_TerminalWrite(byte);
-      return;
+      break;
     }
 #endif
     case dvController:
     {
       tzn_ControllerWrite(byte);
-      return;
+      break;
     }
     default:
     {
       tzn_Error("invalid device"); /* TEMP */
     }
   }
-  TZN_UNREACHABLE();
 }
 
 TZN_LIKELY
@@ -70,5 +71,4 @@ tzn_DeviceRead(U8 device)
       tzn_Error("invalid device"); /* TEMP */
     }
   }
-  TZN_UNREACHABLE();
 }

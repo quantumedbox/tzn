@@ -6,8 +6,8 @@
 
 void tzn_Restart(void);
 
-void tzn_WriteMemory(const U8* to_cpy, U16 offset, U16 size);
+void tzn_CpuPassInitMemory(const U8* to_cpy, U16 size);
 
-void TZN_NORETURN tzn_Exec(void);
+void TZN_NORETURN tzn_CpuExec(void);
 
 #endif

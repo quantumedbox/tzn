@@ -3,7 +3,7 @@
 
 #include "tzn-std.h"
 
-TZN_UNLIKELY void tzn_DevicesInit(void);
+void tzn_DevicesInit(void);
 
 TZN_LIKELY void tzn_DeviceWrite(U8 byte, U8 device);
 

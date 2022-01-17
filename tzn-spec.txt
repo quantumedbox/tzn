@@ -244,7 +244,7 @@
 
     Commands:
       0x01 -- Shutdown
-      0x02 -- Restart
+      0x02 -- Restart (CPU + Devices)
 
     TO-CONSIDER
       -- Battery status command
