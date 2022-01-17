@@ -1,7 +1,7 @@
 #ifndef TZN_DEVICE_H
 #define TZN_DEVICE_H
 
-#include "tzn-std.h"
+#include "tznstd.h"
 
 void tzn_DevicesInit(void);
 

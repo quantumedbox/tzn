@@ -1,5 +1,5 @@
-#include "tzn-terminal.h"
-#include "tzn-std.h"
+#include "tzntrm.h"
+#include "tznstd.h"
 
 static U8 terminal_state;
 

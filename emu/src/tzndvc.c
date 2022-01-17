@@ -1,11 +1,11 @@
-#include "tzn-std.h"
-#include "tzn-io.h"
+#include "tznstd.h"
+#include "tznio.h"
 
 #ifdef TZN_HAS_TERMINAL
-#include "tzn-terminal.h"
+#include "tzntrm.h"
 #endif
 
-#include "tzn-controller.h"
+#include "tznctr.h"
 
 /* Ports are dependent on availability of devices, no assumptions should be made about their order */
 enum {

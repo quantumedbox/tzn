@@ -7,8 +7,8 @@
 #include <SDL.h>
 */
 
-#include "tzn-cpu.h"
-#include "tzn-std.h"
+#include "include/tzn-cpu.h"
+#include "include/tzn-std.h"
 
 /*
 struct Handle

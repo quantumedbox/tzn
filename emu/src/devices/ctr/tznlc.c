@@ -3,9 +3,9 @@
 */
 #include <stdlib.h>
 
-#include "tzn-std.h"
-#include "tzn-cpu.h"
-#include "tzn-device.h"
+#include "tznstd.h"
+#include "tzncpu.h"
+#include "tzndvc.h"
 
 void
 tzn_ControllerInitImpl(void)

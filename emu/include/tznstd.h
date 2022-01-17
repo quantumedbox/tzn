@@ -1,8 +1,8 @@
 #ifndef TZN_COMPILER_H
 #define TZN_COMPILER_H
 
-#include "tzn-types.h"
-#include "tzn-limits.h"
+#include "tzntyp.h"
+#include "tznlmt.h"
 
 #define TZN_VOID ((void*)0)
 

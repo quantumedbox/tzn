@@ -28,25 +28,31 @@ set(INCLUDE_DIRS ${INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
 # )
 # FetchContent_MakeAvailable(SDL2)
 
-include_directories(${INCLUDE_DIRS} ${SDL2_SOURCE_DIR}/include ../)
+include_directories(${INCLUDE_DIRS} ${SDL2_SOURCE_DIR}/include ../include)
 
 if (NOT TZN_MODE)
   set(TZN_MODE "CLI")
 endif()
 
+# TODO Make TZN_MODE depend on env variable
 if (TZN_MODE MATCHES "CLI")
-  set(TZN_MAIN "src/main/tzn-main-cli.c")
-  set(TZN_TERMINAL "src/devices/terminal/tzn-terminal-vt100.c")
-  set(TZN_CONTROLLER "src/devices/controller/tzn-controller-libc.c")
+  set(TZN_MAIN "src/main/tzncli.c")
+  set(TZN_TERMINAL "src/devices/trm/tznvt1.c")
+  set(TZN_CONTROLLER "src/devices/ctr/tznlc.c")
   list(APPEND VARIABLES "TZN_HAS_TERMINAL=1")
 else()
   message(SEND_ERROR "Unknown mode '${TZN_MODE}', try one of available: CLI")
 endif()
 
 file(GLOB SOURCE_FILES ./src/*.c ./src/devices/*.c)
-add_executable(${PROJECT_NAME} ${TZN_MAIN} ${TZN_TERMINAL} ${TZN_CONTROLLER} ${SOURCE_FILES})
-set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD_REQUIRED ON)
+
+message(STATUS ${SOURCE_FILES})
+
+add_executable(${PROJECT_NAME} ${TZN_MAIN})
+target_sources(${PROJECT_NAME} PRIVATE ${TZN_TERMINAL} ${TZN_CONTROLLER} ${SOURCE_FILES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD 90)
+set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD_REQUIRED ON)
+# set_property(TARGET ${PROJECT_NAME} PROPERTY LINKER_LANGUAGE C)
 # target_link_libraries(${PROJECT_NAME} PRIVATE SDL2)
 
 if (CMAKE_C_COMPILER_ID MATCHES GNU)

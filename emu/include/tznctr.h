@@ -1,7 +1,7 @@
 #ifndef TZN_CONTROLLER_H
 #define TZN_CONTROLLER_H
 
-#include "tzn-std.h"
+#include "tznstd.h"
 
 #define CONTROLLER_SHUTDOWN 0x01
 #define CONTROLLER_RESTART  0x02

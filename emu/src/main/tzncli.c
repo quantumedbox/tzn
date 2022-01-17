@@ -1,5 +1,7 @@
-#include "tzn-cpu.h"
-#include "tzn-std.h"
+#include "tzncpu.h"
+#include "tznstd.h"
+
+/* TODO Should not have .c extension but CMake is weird about it */
 
 U8 hello_world_rom[] = {
   SETD, 0x01,

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "tzn-std.h"
+#include "tznstd.h"
 
 /* TODO Abstract IO operations for portability on various libc implementations (Plan 9 for example) */
 

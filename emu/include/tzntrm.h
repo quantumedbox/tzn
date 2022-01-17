@@ -1,7 +1,7 @@
 #ifndef TZN_TERMINAL_H
 #define TZN_TERMINAL_H
 
-#include "tzn-std.h"
+#include "tznstd.h"
 
 #define TERMINAL_RESET                  0x00
 #define TERMINAL_SET_CURSOR_HORIZONTRAL 0x10

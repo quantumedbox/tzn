@@ -1,4 +1,4 @@
-#include "tzn-controller.h"
+#include "tznctr.h"
 
 extern void tzn_ControllerInitImpl(void);
 extern TZN_NORETURN void tzn_ControllerShutdown(void);

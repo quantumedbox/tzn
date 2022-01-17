@@ -1,8 +1,8 @@
 #ifndef TZN_CPU_H
 #define TZN_CPU_H
 
-#include "tzn-std.h"
-#include "tzn-opcodes.h"
+#include "tznstd.h"
+#include "tznops.h"
 
 void tzn_Restart(void);
 

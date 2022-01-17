@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-#include "tzn-cpu.h"
-#include "tzn-std.h"
-#include "tzn-io.h"
-#include "tzn-device.h"
+#include "tzncpu.h"
+#include "tznstd.h"
+#include "tznio.h"
+#include "tzndvc.h"
 
 /* TODO Only provide RAM? Not full address range */
 static U8 memory[TZN_MEMORY_BYTES];
