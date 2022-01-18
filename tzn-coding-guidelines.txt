@@ -5,11 +5,15 @@
 
 - Archaic C:
   - Even though 89/90 guidelines specify that identifiers could be at least 63 characters in isn't the fact on all pre 89/90 compilers
-     Because of that all identifier should have 8 characters at most which leaves 5 significant chars after "tzn" prefix
+    Because of that all identifier should have 8 characters at most which leaves 4 to 5 significant chars after "tzn" or "TZN_" prefix
 
-- Respect SEI CERT C Coding Standard!
+- Respect the SEI CERT C Coding Standard!
 
 - Style:
-  - All variables and function definitions should have comment explaining what their name abbreviates
-  - Each indentation level is signaled by 2 spaces 
+  - All variables, macro and function definitions should have comment explaining what their name abbreviates
+  - Each indentation level is signaled by 2 spaces
+  - Macros identifiers in style of "TZN_MCRO"
+  - Functions identifiers in style of "tznMyFun"
+  - External variables in style of "tznMyVar"
+  - Internal, auto variables, and function arguments in style of "my_var"
   - Enums should not end with comma

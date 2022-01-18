@@ -16,7 +16,11 @@
   0x0080 - 0x00FF -- Reserved
   0x0100 - 0xFFFF -- Random Access Memory
 
-  Reading from and writing to memory below RAM is undefined, use device read and device write instructions instead
+  TO-CONSIDER
+    Having program memory start from 0x0000 might be helpful
+    That way we for first page access you could zero C register
+
+  Reading from and writing to memory outside of RAM is undefined, use device read and write instructions instead
 
 
 -- Registers --
@@ -26,46 +30,52 @@
 
   Here's the list of intended usages for each register:
     General:
-      0 -- A -- Accumulator / Result
-      1 -- B -- Address Low / Counter
-      2 -- C -- Address High / Counter
-      3 -- D -- Device Address
+      0 -- A  -- Accumulator / Result
+      1 -- B  -- Address Low / Counter
+      2 -- C  -- Address High / Counter
+      3 -- D  -- Device Address
     Stack:
-      4 -- L -- Stack Pointer Low
-      5 -- H -- Stack Pointer High
+      4 -- SL  -- Stack Pointer Low
+      5 -- SH  -- Stack Pointer High
     Status:
-      6 -- S -- Overflow / Underflow / Equality
+      6 -- F  -- Flags
+        First bit: Logic / Branch
+        Second bit: Carry / Overflow / Underflow
+        Rest: Reserved
     PC:
       7 -- CL -- Program Counter Low
       8 -- CH -- Program Counter High
 
-  *On startup it's guaranteed that A B C D S registers will all have 0x00 stored
-  *On startup it's guaranteed that [C L] will have 0x0100 value to start execution at
-  *On startup it's guaranteed that [L H] will have highest point in RAM (0xFFFF)
+  *On startup it's guaranteed that A B C D F registers will all have 0x00 stored
+  *On startup it's guaranteed that [CL CH] will have 0x0100 value to start execution at
+  *On startup it's guaranteed that [SL SH] will have highest point in RAM (0xFFFF)
   *Design allows more for registers, but new instructions must be implemented to utilize them, check devices for availability
 
 
 -- Standard Instructions --
 
+  TODO
+    Keep up to date
+
   0x00 -- Move 0x00 to A
   0x01 -- Push immediate byte to A
 
-  0x02 -- Increment A, sets S to 0x01 on overflow and 0x00 otherwise
-  0x03 -- Decrement A, sets S to 0x01 on underflow and 0x00 otherwise
+  0x02 -- Increment A, sets F to 0x01 on overflow and 0x00 otherwise
+  0x03 -- Decrement A, sets F to 0x01 on underflow and 0x00 otherwise
 
-  xxxx -- Increment [B C] registers treating them as word, sets S to 0x01 on overflow and 0x00 otherwise
-  xxxx -- Decrement [B C] registers treating them as word, sets S to 0x01 on underflow and 0x00 otherwise
+  xxxx -- Increment [B C] registers treating them as word, sets F to 0x01 on overflow and 0x00 otherwise
+  xxxx -- Decrement [B C] registers treating them as word, sets F to 0x01 on underflow and 0x00 otherwise
 
-  xxxx -- Flip first bit of S register
+  xxxx -- Flip first bit of F register
 
-  0x04 -- Add immediate byte to A, sets S to 0x01 on overflow and 0x00 otherwise
-  0x05 -- Add contents of B to A, sets S to 0x01 on overflow and 0x00 otherwise
+  0x04 -- Add immediate byte to A, sets F to 0x01 on overflow and 0x00 otherwise
+  0x05 -- Add contents of B to A, sets F to 0x01 on overflow and 0x00 otherwise
 
-  0x06 -- Subtract immediate byte from A, sets S to 0x01 on underflow and 0x00 otherwise
-  0x07 -- Subtract contents of B from A, sets S to 0x01 on underflow and 0x00 otherwise
+  0x06 -- Subtract immediate byte from A, sets F to 0x01 on underflow and 0x00 otherwise
+  0x07 -- Subtract contents of B from A, sets F to 0x01 on underflow and 0x00 otherwise
 
-  0x08 -- Multiply A by immediate byte, sets S to 0x01 on overflow and 0x00 otherwise
-  0x09 -- Multiply A by contents of B, sets S to 0x01 on overflow and 0x00 otherwise
+  0x08 -- Multiply A by immediate byte, sets F to 0x01 on overflow and 0x00 otherwise
+  0x09 -- Multiply A by contents of B, sets F to 0x01 on overflow and 0x00 otherwise
 
   0x0A -- Integer division of A by immediate byte
   0x0B -- Integer division of A by contents of B
@@ -81,17 +91,17 @@
   0x20 -- Move A to B
   0x21 -- Move A to C
   0x21 -- Move A to D
-  0x23 -- Move A to L
-  0x24 -- Move A to H
-  xxxx -- Move A to S
+  0x23 -- Move A to SL
+  0x24 -- Move A to SH
+  xxxx -- Move A to F
   xxxx -- Move memory at [B C] to A
 
   0x25 -- Move B to A
   0x26 -- Move C to A
   0x26 -- Move D to A
-  0x28 -- Move L to A
-  0x29 -- Move H to A
-  xxxx -- Move S to A
+  0x28 -- Move SL to A
+  0x29 -- Move SH to A
+  xxxx -- Move F to A
 
   xxxx -- Move A to an absolute address from immediate bytes
   0x2A -- Move A to an absolute address that is composed from [B C] registers
@@ -102,22 +112,22 @@
   xxxx -- Unconditional jump to an absolute address from immediate bytes
   0x32 -- Unconditional jump to an absolute address that is composed from [B C] registers
 
-  xxxx -- Conditional jump on S register == 0x01 to an absolute address from immediate bytes
-  0x36 -- Conditional jump on S register == 0x01 to an absolute address that is composed from [B C] registers
+  xxxx -- Conditional jump on F register == 0x01 to an absolute address from immediate bytes
+  0x36 -- Conditional jump on F register == 0x01 to an absolute address that is composed from [B C] registers
 
   0x3B -- Unconditional relative jump by immediate byte, value treated as signed
   0x3A -- Unconditional relative jump by A register, value treated as signed
 
-  0x3B -- Conditional relative jump on S register == 0x01 by immediate byte, value treated as signed
-  0x3A -- Conditional relative jump on S register == 0x01 by contents of A register, value treated as signed
+  0x3B -- Conditional relative jump on F register == 0x01 by immediate byte, value treated as signed
+  0x3A -- Conditional relative jump on F register == 0x01 by contents of A register, value treated as signed
 
-  xxxx -- Push B to stack, decrementing the [L H] registers
-  xxxx -- Pull from stack to B, incrementing the [L H] registers
+  xxxx -- Push A to stack, decrementing the [SL SH] registers
+  xxxx -- Pull from stack to A, incrementing the [SL SH] registers
 
-  xxxx -- Jump to subroutine from immediate absolute address, while storing position of next instruction into the [L H] registers
-  xxxx -- Jump to subroutine from address composed from [B C] registers, while storing position of next instruction into the [L H] registers
+  xxxx -- Jump to subroutine from immediate absolute address, while storing position of next instruction into the [SL SH] registers
+  xxxx -- Jump to subroutine from address composed from [B C] registers, while storing position of next instruction into the [SL SH] registers
 
-  xxxx -- Return from subroutine by jumping to address stored at [L H] registers after decrementing the stack pointer
+  xxxx -- Return from subroutine by jumping to address stored at [SL SH] registers after decrementing the stack pointer
 
   xxxx -- Device write where contents of D is a device address and immediate byte is sent
   0x40 -- Device write where contents of D is a device address and A is sent

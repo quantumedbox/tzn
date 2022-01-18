@@ -2,8 +2,9 @@
 
 #include "tzncpu.h"
 #include "tznstd.h"
-#include "tznio.h"
+#include "tznsys.h"
 #include "tzndvc.h"
+#include "tznerr.h"
 
 static U8 shdl_res; /* Should Restart */
 static CpuMemCB memincb; /* Memory Init Callback */

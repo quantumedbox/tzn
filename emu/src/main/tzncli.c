@@ -1,24 +1,11 @@
 #include "tzncpu.h"
 #include "tznstd.h"
+#include "tznsys.h"
+#include "tznerr.h"
 
-#include "assert.h"
+static const char* filename;
 
-/*U8 hello_world_rom[] = {
-  iMOVID, 0x01,
-  iMOVIB, 0x12,
-  iMOVIC, 0x01,
-  DVWI, 0x14,
-  DVWM,
-  iMOVMA,
-  EQLI, 0x00,
-  JMPCRI, 3,
-  iINCBC,
-  JMPRI, -10,
-  JMPRI, -2,
-  'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', 0x00
-};*/
-
-U8 test[] = {
+U8 def_rom[] = {
   iMOVID, 0x01,
   iMOVIB, 0x14,
   iMOVIC, 0x01,
@@ -36,18 +23,38 @@ U8 test[] = {
 
 /* Sets CPU initial RAM state on startup */
 static
-void memInit(U8* memory, U16 size)
+void
+defRomIn(U8* memory, U16 size)
 {
-  U16 idx = sizeof(test);
-  TZN_ASRT(size >= sizeof(test), "Cannot fit ROM in RAM");
+  U16 idx = sizeof(def_rom);
+  TZN_ASRT(size >= sizeof(def_rom), "Cannot fit ROM in RAM");
   while (idx--)
-    memory[idx] = test[idx];
+    memory[idx] = def_rom[idx];
+}
+
+static
+void
+fileIn(U8* memory, U16 size)
+{
+  if (!filename)
+    tznError("NULL filename");
+  if (tznFlRd(filename, memory, size, TZN_NULL, TZN_FL0))
+    tznError("Error while reading ROM");
 }
 
 int
-main(void)
+main(int argc, char** argv)
 {
-  tznCpuMc(memInit);
+  if (argc > 1)
+  {
+    filename = argv[1];
+    tznCpuMc(fileIn);
+  }
+  else
+  {
+    tznCpuMc(defRomIn);
+  }
+
   tznCpuEx();
 
   return 0;

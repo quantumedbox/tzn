@@ -1,5 +1,6 @@
 #include "tznstd.h"
-#include "tznio.h"
+#include "tznsys.h"
+#include "tznerr.h"
 
 #ifdef TZN_HTRM
 #include "tzntrm.h"

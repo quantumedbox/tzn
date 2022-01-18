@@ -1,48 +1,166 @@
 #ifndef TZN_OPCODES_H
 #define TZN_OPCODES_H
 
+/* TODO Shouldn't be holey, but for now it is */
+/* TODO Do we need bit operators? Feels like shift left right might be quite handy */
 enum {
-  ZEROA,  /* Zero A register */
+  /* First 64 instuctions are without immediate bytes */
+  iADDB,    /* Add B to A */
+  iSUBB,    /* Subtract B from A */
+  iMULB,
+  iDIVB,
+  iMODB,
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+ 
+  iMOV0A,
+  iMOVAB,   /* Move A to B */
+  iMOVAC,   /* Move A to C */
+  iMOVAD,   /* Move A to D */
+  iMOVASL,  /* Move A to SL */
+  iMOVASH,  /* Move A to SH */
+/*  iGAP,*/
+  iMOVAM,   /* Move A to memory at [B C] */
 
-  SETA,   /* Set A by immediate byte */
-  SETB,   /* Set X by immediate byte */
-  SETC,   /* Set X by immediate byte */
-  SETD,   /* Set Y by immediate byte */
+/*  iGAP,*/ /* TODO Some special handy A register operation */
+  iMOVBA,   /* Move B to A */
+  iMOVCA,   /* Move C to A */
+  iMOVDA,   /* Move D to A */
+  iMOVSLA,  /* Move SL to A */
+  iMOVSHA,  /* Move SH to A */
+/*  iGAP,*/
+  iMOVMA,   /* Move memory at [B C] to A */
 
-  MOVAB,  /* Move A to B */
-  MOVAC,  /* Move A to C */
-  MOVAD,  /* Move A to D */
+  iINCA,
+  iDECA,
+  iINCB,
+  iDECB,
+  iINCBC,
+  iDECBC,
+  iINCM,
+  iDECM,
 
-  MOVBA,  /* Move B to A */
-  MOVCA,  /* Move C to A */
-  MOVDA,  /* Move D to A */
-  MOVMA,  /* Move memory at [A B] to A */
+  iEQLB,    /* Equality of A and B, S is set to 0x01 on equality and 0x00 otherwise */
+  iCMPB,    /* Less than comparison between A and B, logic Status register is set if A is less than B */
 
-  INCA,   /* Increment A, sets S to 0x01 on overflow */
-  INCBC,  /* Increment A B as word, sets S to 0x01 on overflow */
+  iJMPRA,   /* Relative unconditional jump by A register treated as singed */
+  iJMPCRA,  /* Relative conditional jump by A register treated as singed */
 
-  DECA,   /* Decrement A, sets S to 0x01 on underflow */
-  DECAB,  /* Decrement A B as word, sets S to 0x01 on underflow */
+  iDVCWA,   /* Device write to D port where A register contains data to send */
+  iDVCWM,   /* Device write to D port where byte at memory location [B C] is to send */
 
-  FLP,    /* Flip first bit of S register */
+  iDVCRA,   /* Device read from D port to A register */
+  iDVCRM,   /* Device read from D port to [B C] memory address */
 
-  ADDI,   /* Add immediate byte to A */
-  ADDB,   /* Add B to A */
+  iCALLBC,  /* Decrement Stack Pointer, store address of next instruction at stack then jump to [B C] */
+  iRET,
 
-  SUBI,   /* Subtract immediate byte from A */
-  SUBB,   /* Subtract B from A */
+  iPUSHA,
+  iPOPA,
+  iPUSHB,
+  iPOPB,
 
-  EQLI,   /* Equality of A and immediate byte, S is set to 0x01 on equality and 0x00 otherwise */
-  EQLB,   /* Equality of A and B, S is set to 0x01 on equality and 0x00 otherwise */
+  iFLP,     /* Flip logic (first) bit of Status register */
+  iCARTOL,  /* Set logic (first) bit to value of second (carry / overflow) bit of Status register */
 
-  JMPRI,  /* Relative unconditional jump by immediate byte treated as singed */
-  JMPCRI, /* Relative conditional jump by immediate byte treated as singed */
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
 
-  DVWI,   /* Device write from immediate byte where D is device register */
-  DVWA,   /* Device write from A where D is device register */
-  DVWM,   /* Device write from memory at [A B] where D is device register */
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
 
-  DVR     /* Device read to A where D is device register */
+  /* Next 64 instructions have 1 immediate byte */
+  iADDI,    /* Add immediate byte to A */
+  iSUBI,    /* Subtract immediate byte from A */
+  iMULI,
+  iDIVI,
+  iMODI,
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+
+  iMOVIA,   /* Move immediate byte to A */
+  iMOVIB,   /* Move immediate byte to B */
+  iMOVIC,   /* Move immediate byte to C */
+  iMOVID,   /* Move immediate byte to D */
+  iMOVISL,  /* Move immediate byte to SL */
+  iMOVISH,  /* Move immediate byte to SH */
+/*  iGAP,*/
+/*  iGAP,*/
+
+  /* TODO Inc / Dec by immediate? */
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+
+  iEQLI,    /* Equality of A and immediate byte, S is set to 0x01 on equality and 0x00 otherwise */
+  iCMPI,    /* Less than comparison between A and immediate byte, logic Status register is set if A is less than immediate byte */
+
+  iJMPRI,   /* Relative unconditional jump by immediate byte treated as singed */
+  iJMPCRI,  /* Relative conditional jump by immediate byte treated as singed */
+
+  iDVCWI,   /* Device write to D port where immediate byte is to send */
+/*  iGAP,*/
+
+/*  iGAP,*/
+/*  iGAP,*/
+
+  iCALLRI,  /* Decrement Stack Pointer, store address of next instruction at stack then perform relative jump by immediate byte as signed */
+/*  iGAP,*/
+
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+
+/*  iGAP,*/
+/*  iGAP,*/
+
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+
+  /* Next 64 instructions have 2 immediate bytes */
+  iMOVIMA,  /* Move memory at immediate absolute address to A */
+  iMOVAIM,  /* Move A to an absolute immediate address */
+  iDVCRIM,  /* Device read from D port to immediate absolute memory address */
+  iCALLIM   /* Decrement Stack Pointer, store address of next instruction at stack then jump at immediate absolute address */
+
+  /* TODO Fill this space */
+
+  /* Next free estate for expansion sets */
 };
 
 #endif
