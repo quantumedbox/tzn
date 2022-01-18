@@ -4,3 +4,6 @@ Follow C 89/90 guidelines as strictly as possible:
   -- All source / header files should have names with 8 symbols at most, which leaves 3 symbols after "tzn" prefix and file extension
 
 Respect SEI CERT C Coding Standard!
+
+Style:
+  -- Each indentation level is signaled by 2 spaces 
