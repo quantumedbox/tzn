@@ -14,7 +14,7 @@ static
 void
 tzn_CpuInit(U8* memory)
 {
-  TZN_ASSERT(memory_init_callback != TZN_VOID, "NULL in memory_init_callback");
+  TZN_ASSERT(memory_init_callback, "NULL in memory_init_callback");
   memory_init_callback(&memory[TZN_MEMORY_RAM_START], TZN_MEMORY_RAM_BYTES);
 }
 
@@ -27,7 +27,7 @@ tzn_CpuRestart(void)
 void
 tzn_CpuRegisterMemoryInitCallback(CpuMemoryInitCallback callback)
 {
-  TZN_ASSERT(callback != TZN_VOID, "NULL passed in tzn_CpuRegisterMemoryInitCallback()");
+  TZN_ASSERT(callback, "NULL passed in tzn_CpuRegisterMemoryInitCallback()");
   memory_init_callback = callback;
 }
 

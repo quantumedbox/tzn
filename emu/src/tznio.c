@@ -12,5 +12,5 @@ tzn_Error(const char* literal)
   fputs("[error: ", stderr);
   fputs(literal, stderr);
   fputc(']', stderr);
-  abort();
+  exit(EXIT_FAILURE);
 }

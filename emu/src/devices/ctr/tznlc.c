@@ -17,7 +17,7 @@ TZN_NORETURN
 void
 tzn_ControllerShutdown(void)
 {
-  abort();
+  exit(EXIT_SUCCESS);
 }
 
 /* TODO We probably need to ensure that nested resets do not cause stack growth */

@@ -1,6 +1,8 @@
 #include "tzncpu.h"
 #include "tznstd.h"
 
+#include "assert.h"
+
 U8 hello_world_rom[] = {
   SETD, 0x01,
   SETB, 0x12,
@@ -28,7 +30,7 @@ U8 test[] = {
   INCBC,
   JMPRI, -10,
   SETD, 0x02,
-  DVWI, 0x02,
+  DVWI, 0x01,
   'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', 0x00
 };
 
@@ -45,7 +47,6 @@ void memoryInit(U8* memory, U16 size)
 int
 main(void)
 {
-  TZN_ASSERT(0, "fuck");
   tzn_CpuRegisterMemoryInitCallback(memoryInit);
   tzn_CpuExec();
 
