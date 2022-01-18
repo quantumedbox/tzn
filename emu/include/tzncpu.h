@@ -12,6 +12,6 @@ void tznCpuRs(void);
 /* Register function that should initialize CPU internal memory on startup */
 void tznCpuMc(CpuMemCB);
 
-void TZN_NORETURN tznCpuEx(void);
+void TZN_NORE tznCpuEx(void);
 
 #endif

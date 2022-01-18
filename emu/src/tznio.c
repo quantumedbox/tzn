@@ -5,7 +5,7 @@
 
 /* TODO Abstract IO operations for portability on various libc implementations (Plan 9 for example) */
 
-TZN_NORETURN
+TZN_NORE
 void
 tznError(const char* literal)
 {

@@ -13,7 +13,7 @@ tznCtrII(void)
   /* Empty */
 }
 
-TZN_NORETURN
+TZN_NORE
 void
 tznCtrSD(void)
 {

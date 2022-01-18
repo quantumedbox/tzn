@@ -3,8 +3,8 @@
 
 #include "tznstd.h"
 
-#define CONTROLLER_SHUTDOWN 0x01
-#define CONTROLLER_RESTART  0x02
+#define TZN_CTRS 0x01 /* Shutdown Command */
+#define TZN_CTRR 0x02 /* Restart Command */
 
 void tznCtrIn(void);
 void tznCtrWr(U8 byte);

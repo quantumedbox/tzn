@@ -39,7 +39,7 @@ static
 void memInit(U8* memory, U16 size)
 {
   U16 idx = sizeof(test);
-  TZN_ASSERT(size >= sizeof(test), "Cannot fit ROM in RAM");
+  TZN_ASRT(size >= sizeof(test), "Cannot fit ROM in RAM");
   while (idx--)
     memory[idx] = test[idx];
 }

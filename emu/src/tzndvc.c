@@ -1,7 +1,7 @@
 #include "tznstd.h"
 #include "tznio.h"
 
-#ifdef TZN_HAS_TERMINAL
+#ifdef TZN_HTRM
 #include "tzntrm.h"
 #endif
 
@@ -10,7 +10,7 @@
 /* Ports are dependent on availability of devices, no assumptions should be made about their order */
 enum {
   dvNone,
-#ifdef TZN_HAS_TERMINAL
+#ifdef TZN_HTRM
   dvTerminal,
 #endif
   dvController
@@ -20,19 +20,19 @@ enum {
 void
 tznDvcIn(void)
 {
-#ifdef TZN_HAS_TERMINAL
+#ifdef TZN_HTRM
   tznTrmIn();
 #endif
   tznCtrIn();
 }
 
-TZN_LIKELY
+TZN_HOT
 void
 tznDvcWr(U8 byte, U8 device)
 {
   switch (device)
   {
-#ifdef TZN_HAS_TERMINAL
+#ifdef TZN_HTRM
     case dvTerminal:
     {
       tznTrmWr(byte);
@@ -51,13 +51,13 @@ tznDvcWr(U8 byte, U8 device)
   }
 }
 
-TZN_LIKELY
+TZN_HOT
 U8
 tznDvcRd(U8 device)
 {
   switch (device)
   {
-#ifdef TZN_HAS_TERMINAL
+#ifdef TZN_HTRM
     case dvTerminal:
     {
       return tznTrmRd();

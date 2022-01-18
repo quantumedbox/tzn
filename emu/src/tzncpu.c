@@ -14,8 +14,8 @@ static
 void
 tznCpuIn(U8* memory)
 {
-  TZN_ASSERT(memincb, "NULL in memory init callback");
-  memincb(&memory[TZN_MEMORY_RAM_START], TZN_MEMORY_RAM_BYTES);
+  TZN_ASRT(memincb, "NULL in memory init callback");
+  memincb(&memory[TZN_MRMS], TZN_MRMB);
 }
 
 void
@@ -27,11 +27,11 @@ tznCpuRs(void)
 void
 tznCpuMc(CpuMemCB callback)
 {
-  TZN_ASSERT(callback, "NULL passed in tznCpuMc()");
+  TZN_ASRT(callback, "NULL passed in tznCpuMc()");
   memincb = callback;
 }
 
-TZN_NORETURN
+TZN_NORE
 void
 tznCpuEx(void)
 {
@@ -40,22 +40,22 @@ tznCpuEx(void)
     TODO Combine related field into handler to pass around,
          for example, that way we could have INIT_REGISTER_STATE as function instead of macro
   */
-  U8 memory[TZN_MEMORY_BYTES];
+  U8 memory[TZN_MTOB];
   register U16 pgc_r; /* Program Counter Registers */
-  U8 regs[TZN_GENERAL_REGISTER_COUNT]; /* Registers */
+  U8 regs[TZN_REGG]; /* Registers */
   U8 status_r; /* Status Register */
 
   tznCpuIn(memory);
   tznDvcIn();
 
 #define INIT_REGISTER_STATE() { \
-    U16 idx = TZN_GENERAL_REGISTER_COUNT; \
+    U16 idx = TZN_REGG; \
     while (idx--) \
       regs[idx] = 0x00; \
-    pgc_r = TZN_MEMORY_RAM_START; \
+    pgc_r = TZN_MRMS; \
     status_r = 0x00; \
-    regs[rgL] = U16_LOW(TZN_STARTUP_STACK_POINTER_VALUE); \
-    regs[rgH] = U16_HIGH(TZN_STARTUP_STACK_POINTER_VALUE); \
+    regs[rgL] = U16_LOW(TZN_SPIN); \
+    regs[rgH] = U16_HIGH(TZN_SPIN); \
   }
 
   INIT_REGISTER_STATE();
@@ -135,7 +135,7 @@ tznCpuEx(void)
       }
       case MOVMA:
       {
-        regs[rgA] = memory[U16_COMPOSE(regs[rgB], regs[rgC])];
+        regs[rgA] = memory[U16_INIT(regs[rgB], regs[rgC])];
         break;
       }
       case INCA:
@@ -210,13 +210,13 @@ tznCpuEx(void)
       case JMPRI:
       {
         U8 rel_addr = memory[pgc_r++];
-        U16_SUB_I8(pgc_r, rel_addr);
+        U16_S_I8(pgc_r, rel_addr);
         break;
       }
       case JMPCRI:
       {
         U8 rel_addr = memory[pgc_r++] * status_r;
-        U16_SUB_I8(pgc_r, rel_addr);
+        U16_S_I8(pgc_r, rel_addr);
         break;
       }
       case DVWI:
@@ -231,7 +231,7 @@ tznCpuEx(void)
       }
       case DVWM:
       {
-        tznDvcWr(memory[U16_COMPOSE(regs[rgB], regs[rgC])], regs[rgD]);
+        tznDvcWr(memory[U16_INIT(regs[rgB], regs[rgC])], regs[rgD]);
         break;
       }
       case DVR:

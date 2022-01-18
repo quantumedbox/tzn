@@ -39,7 +39,7 @@ main(void)
     /* 'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', 0 */
   };
 
-  tzn_WriteMemory(test_code, TZN_MEMORY_RAM_START, sizeof test_code);
+  tzn_WriteMemory(test_code, TZN_MRMS, sizeof test_code);
   tznCpuEx();
 
   /*

@@ -22,7 +22,7 @@ static U8 cur_ypos;
 
 static U8 scr_map[T_WIDTH * T_HEIGHT];
 
-TZN_LIKELY
+TZN_HOT
 static
 void
 updCurXY(void)
@@ -79,7 +79,7 @@ tznTrmCV(U8 state)
     fputs(HIDE_CUR, stdout);
 }
 
-TZN_LIKELY
+TZN_HOT
 void
 tznTrmPC(U8 ch)
 {

@@ -11,6 +11,6 @@
   @brief  Print null terminated string holding error message and then exit
   @warn   Preferably only const literals should be passed here, don't mess with null strings
 */
-TZN_NORETURN void tznError(const char* literal);
+TZN_NORE void tznError(const char* literal);
 
 #endif

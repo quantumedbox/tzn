@@ -12,7 +12,7 @@ extern void tznTrmII(void); /* Internal init */
 extern void tznTrmCX(U8 pos); /* Set cursor X pos */
 extern void tznTrmCY(U8 pos); /* Set cursor Y pos */
 extern void tznTrmCV(U8 state); /* Set cursor visibility */
-extern TZN_LIKELY void tznTrmPC(U8 ch); /* Put char */
+extern TZN_HOT void tznTrmPC(U8 ch); /* Put char */
 extern U8 tznTrmGC(U8 x, U8 y); /* Get char */
 
 extern U8 tznTrmSX;
@@ -39,11 +39,11 @@ tznTrmIn(void)
   tznTrmII();
 }
 
-TZN_LIKELY
+TZN_HOT
 void
 tznTrmWr(U8 byte)
 {
-  if (byte == TERMINAL_RESET) {
+  if (byte == TZN_TRMR) {
     state = tsNone;
     return;
   }
@@ -55,37 +55,37 @@ tznTrmWr(U8 byte)
     {
       switch (byte)
       {
-        case TERMINAL_SET_CURSOR_HORIZONTRAL:
+        case TZN_TRMX:
         {
           state = tsWSCurX;
           break;
         }
-        case TERMINAL_SET_CURSOR_VERTICAL:
+        case TZN_TRMY:
         {
           state = tsWSCurY;
           break;
         }
-        case TERMINAL_SET_CURSOR_VISIBILITY:
+        case TZN_TRMV:
         {
           state = tsWSCurV;
           break;
         }
-        case TERMINAL_PUT_CHAR:
+        case TZN_TRMC:
         {
           state = tsWPutCh;
           break;
         }
-        case TERMINAL_PUT_STRING:
+        case TZN_TRMS:
         {
           state = tsWPutSt; /* Wair Put String */
           break;
         }
-        case TERMINAL_GET_DISPLAY_SIZE:
+        case TZN_TRMD:
         {
           state = tsSDisSX; /* Send */
           break;
         }
-        case TERMINAL_GET_CHAR:
+        case TZN_TRMA:
         {
           state = tsWChX;  /* Get Char Wait X */
           break;

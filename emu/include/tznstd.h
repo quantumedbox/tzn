@@ -9,78 +9,79 @@
 #define TZN_VOID ((void*)0)
 
 #ifdef __GNUC__
-  #define TZN_NORETURN  __attribute__((noreturn))
-  #define TZN_LIKELY    __attribute__((hot))
-  #define TZN_UNLIKELY  __attribute__((cold))
-  #define TZN_INLINE    __attribute__((always_inline))
-  #define TZN_NOINLINE  __attribute__((noinline))
+  #define TZN_NORE  __attribute__((noreturn))
+  #define TZN_HOT   __attribute__((hot))
+  #define TZN_COLD  __attribute__((cold))
+  #define TZN_INL   __attribute__((always_inline))
+  #define TZN_NINL  __attribute__((noinline))
 #else /* Unknown compiler */
-  #define TZN_NORETURN  /* No effect */
-  #define TZN_LIKELY    /* No effect */
-  #define TZN_UNLIKELY  /* No effect */
-  #define TZN_INLINE    inline
-  #define TZN_NOINLINE  /* No effect */
+  #define TZN_NORE  /* No effect */
+  #define TZN_HOT   /* No effect */
+  #define TZN_COLD  /* No effect */
+  #define TZN_INL   inline
+  #define TZN_NINL  /* No effect */
 #endif
 
 #include "tznio.h"
 
-#define TZN_STRINGIZE_INTERNAL(x) #x
-#define TZN_STRINGIZE(x) TZN_STRINGIZE_INTERNAL(x)
+#define TZN_STRL(x) #x
+#define TZN_STR(x) TZN_STRL(x)
 
 #ifndef TZN_RELEASE
-  #define TZN_ASSERT(cond, literal) do { if (!(cond)) tznError(__FILE__ ":" TZN_STRINGIZE(__LINE__) ": \"" literal "\""); } while (0)
+  #define TZN_ASRT(cond, literal) do { if (!(cond)) tznError(__FILE__ ":" TZN_STR(__LINE__) ": \"" literal "\""); } while (0)
 #else
-  #define TZN_ASSERT(cond, literal) ((void)0)
+  #define TZN_ASRT(cond, literal) ((void)0)
 #endif
 
 #ifdef __GNUC__
   #ifndef TZN_RELEASE
-    #define TZN_UNREACHABLE() TZN_ASSERT(0, "reached unreachable")
+    #define TZN_DEAD() TZN_ASRT(0, "reached unreachable")
   #else
-    #define TZN_UNREACHABLE() __builtin_unreachable()
+    #define TZN_DEAD() __builtin_unreachable()
   #endif
 #else
   #ifndef TZN_RELEASE
-    #define TZN_UNREACHABLE() TZN_ASSERT(0, "reached unreachable")
+    #define TZN_DEAD() TZN_ASRT(0, "reached unreachable")
   #else
-    #define TZN_UNREACHABLE() ((void)0) /* TODO Shouldn't be just ignored */
+    #define TZN_DEAD() ((void)0) /* TODO Shouldn't be just ignored */
   #endif
 #endif
 
-#ifndef TZN_IS_LITTLE_ENDIAN
+#ifndef TZN_ISLE /* Is Little Endian */
   #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || \
       defined(__BIG_ENDIAN__) || \
       defined(__ARMEB__) || \
       defined(__THUMBEB__) || \
       defined(__AARCH64EB__) || \
       defined(_MIBSEB) || defined(__MIBSEB) || defined(__MIBSEB__)
-    #define TZN_IS_LITTLE_ENDIAN 0
+    #define TZN_ISLE 0
   #elif defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN || \
       defined(__LITTLE_ENDIAN__) || \
       defined(__ARMEL__) || \
       defined(__THUMBEL__) || \
       defined(__AARCH64EL__) || \
       defined(_MIPSEL) || defined(__MIPSEL) || defined(__MIPSEL__)
-    #define TZN_IS_LITTLE_ENDIAN 1
+    #define TZN_ISLE 1
   #else
-    #error "Can't determine endianness of target, set TZN_IS_LITTLE_ENDIAN macro to 0 or 1 manually"
+    #error "can't determine endianness of target, set TZN_ISLE macro to 0 or 1 manually"
   #endif
 #endif
 
-#if TZN_IS_LITTLE_ENDIAN == 1
-  #define U16_COMPOSE(low, high) (((U16)high << 8) | (U16)low)
+#if TZN_ISLE == 1
+  #define U16_INIT(low, high) (((U16)high << 8) | (U16)low)
   #define U16_LOW(v) (v >> 8)
   #define U16_HIGH(v) (v & 0x0F)
 #else
-  #define U16_COMPOSE(low, high) (((U16)low << 8) | (U16)high)
+  #define U16_INIT(low, high) (((U16)low << 8) | (U16)high)
   #define U16_LOW(v) (v & 0x0F)
   #define U16_HIGH(v) (v >> 8)
 #endif
 
-#define U16_SUB_I8(subtrahend, subtractor) \
-  if (subtractor & 0x80) \
-    subtrahend = (subtrahend - (U8)~subtractor) - 1; \
+/* Subtraction of signed 8 bit integer from 16 unsigned one */
+#define U16_S_I8(sbtrhnd, sbtrctr) \
+  if (sbtrctr & 0x80) \
+    sbtrhnd = (sbtrhnd - (U8)~sbtrctr) - 1; \
   else \
-    subtrahend += subtractor;
+    sbtrhnd += sbtrctr;
 
 #endif
