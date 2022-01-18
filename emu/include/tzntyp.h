@@ -1,6 +1,8 @@
 #ifndef TZN_TYPES_H
 #define TZN_TYPES_H
 
+#define TZN_NULL ((void*)0)
+
 #define U8 unsigned char
 #define U16 unsigned short
 #define U32 unsigned int
@@ -13,5 +15,10 @@
 
 #define U8_MIN (U8)0
 #define U8_MAX ((U8)-1)
+
+#define tznErr U8
+#define tznBool U8
+#define TZN_YES ((tznBool)1)
+#define TZN_NO ((tznBool)0)
 
 #endif

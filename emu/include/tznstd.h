@@ -4,10 +4,6 @@
 #include "tzntyp.h"
 #include "tznlmt.h"
 
-/* TODO Shorten macro names to 8 chars */
-
-#define TZN_VOID ((void*)0)
-
 #ifdef __GNUC__
   #define TZN_NORE  __attribute__((noreturn))
   #define TZN_HOT   __attribute__((hot))
@@ -20,17 +16,6 @@
   #define TZN_COLD  /* No effect */
   #define TZN_INL   inline
   #define TZN_NINL  /* No effect */
-#endif
-
-#include "tznio.h"
-
-#define TZN_STRL(x) #x
-#define TZN_STR(x) TZN_STRL(x)
-
-#ifndef TZN_RELEASE
-  #define TZN_ASRT(cond, literal) do { if (!(cond)) tznError(__FILE__ ":" TZN_STR(__LINE__) ": \"" literal "\""); } while (0)
-#else
-  #define TZN_ASRT(cond, literal) ((void)0)
 #endif
 
 #ifdef __GNUC__
