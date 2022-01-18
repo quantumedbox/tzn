@@ -4,9 +4,13 @@
 #include "tznstd.h"
 #include "tznops.h"
 
-void tzn_Restart(void);
+typedef void (*CpuMemoryInitCallback)(U8* memory, U16 size);
 
-void tzn_CpuPassInitMemory(const U8* to_cpy, U16 size);
+/* Signal to CPU that it should reset itself and all attached devices */
+void tzn_CpuRestart(void);
+
+/* Register function that should initialize CPU internal memory on startup */
+void tzn_CpuRegisterMemoryInitCallback(CpuMemoryInitCallback);
 
 void TZN_NORETURN tzn_CpuExec(void);
 

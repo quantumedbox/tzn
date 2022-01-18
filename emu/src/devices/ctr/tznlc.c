@@ -27,5 +27,5 @@ tzn_ControllerShutdown(void)
 void
 tzn_ControllerReset(void)
 {
-  tzn_Restart();
+  tzn_CpuRestart();
 }

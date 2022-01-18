@@ -20,6 +20,8 @@
   #define TZN_NOINLINE  /* No effect */
 #endif
 
+#include "tznio.h"
+
 #ifdef TZN_DEBUG
   #define TZN_ASSERT(cond, literal) do { if (!(cond)) tzn_Error(literal); } while (0)
 #else

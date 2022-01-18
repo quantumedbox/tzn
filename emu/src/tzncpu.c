@@ -6,41 +6,29 @@
 #include "tzndvc.h"
 
 static U8 should_restart;
-/* Passed externally, should outlive next tzn_CpuExec call which depends on it */
-static const U8* init_memory = TZN_VOID;
-static U16 init_memory_size;
+static CpuMemoryInitCallback memory_init_callback;
 
 enum { rgA, rgB, rgC, rgD, rgL, rgH };
-
-void
-tzn_Restart(void)
-{
-  should_restart = 1;
-}
 
 static
 void
 tzn_CpuInit(U8* memory)
 {
-  U16 idx;
-
-  TZN_ASSERT(init_memory != TZN_VOID, "void pointer for memory initialization, check that you're calling tzn_CpuPassInitMemory()");
-  TZN_ASSERT(init_memory_size < TZN_MEMORY_RAM_BYTES, "cannot fit initialization memory");
-
-  idx = 0;
-  for (; idx < init_memory_size; idx++)
-  {
-    memory[TZN_MEMORY_RAM_START + idx] = init_memory[idx];
-  }
+  TZN_ASSERT(memory_init_callback != TZN_VOID, "NULL in memory_init_callback");
+  memory_init_callback(&memory[TZN_MEMORY_RAM_START], TZN_MEMORY_RAM_BYTES);
 }
 
 void
-tzn_CpuPassInitMemory(const U8* mem, U16 size)
+tzn_CpuRestart(void)
 {
-  TZN_ASSERT(size < TZN_MEMORY_RAM_BYTES, "cannot fit initialization memory");
+  should_restart = 1;
+}
 
-  init_memory = mem;
-  init_memory_size = size;
+void
+tzn_CpuRegisterMemoryInitCallback(CpuMemoryInitCallback callback)
+{
+  TZN_ASSERT(callback != TZN_VOID, "NULL passed in tzn_CpuRegisterMemoryInitCallback()");
+  memory_init_callback = callback;
 }
 
 TZN_NORETURN
@@ -50,14 +38,14 @@ tzn_CpuExec(void)
   /* TODO Only provide RAM? Not full address range */
   /*
     TODO Combine related field into handler to pass around,
-          for example, that way we could have INIT_REGISTER_STATE as function instead of macro
+         for example, that way we could have INIT_REGISTER_STATE as function instead of macro
   */
   U8 memory[TZN_MEMORY_BYTES];
   register U16 program_counter;
   U8 registers[TZN_GENERAL_REGISTER_COUNT];
   U8 status_register;
 
-  tzn_CpuInit(&memory);
+  tzn_CpuInit(memory);
   tzn_DevicesInit();
 
 #define INIT_REGISTER_STATE() { \
@@ -256,7 +244,7 @@ tzn_CpuExec(void)
       }
     }
     if (should_restart) {
-      tzn_CpuInit(&memory);
+      tzn_CpuInit(memory);
       tzn_DevicesInit();
       INIT_REGISTER_STATE();
       should_restart = 0;

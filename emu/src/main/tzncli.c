@@ -1,8 +1,6 @@
 #include "tzncpu.h"
 #include "tznstd.h"
 
-/* TODO Should not have .c extension but CMake is weird about it */
-
 U8 hello_world_rom[] = {
   SETD, 0x01,
   SETB, 0x12,
@@ -34,10 +32,20 @@ U8 test[] = {
   'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', 0x00
 };
 
+/* Sets CPU initial RAM state on startup */
+static
+void memoryInit(U8* memory, U16 size)
+{
+  U16 idx = sizeof(test);
+  TZN_ASSERT(size >= sizeof(test), "Cannot fit ROM in RAM");
+  while (idx--)
+    memory[idx] = test[idx];
+}
+
 int
 main(void)
 {
-  tzn_CpuPassInitMemory(test, sizeof test);
+  tzn_CpuRegisterMemoryInitCallback(memoryInit);
   tzn_CpuExec();
 
   return 0;
