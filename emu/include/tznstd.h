@@ -22,10 +22,13 @@
 
 #include "tznio.h"
 
+#define TZN_STRINGIZE_INTERNAL(x) #x
+#define TZN_STRINGIZE(x) TZN_STRINGIZE_INTERNAL(x)
+
 #ifdef TZN_DEBUG
-  #define TZN_ASSERT(cond, literal) do { if (!(cond)) tzn_Error(literal); } while (0)
+  #define TZN_ASSERT(cond, literal) do { if (!(cond)) tzn_Error(__FILE__ ":" TZN_STRINGIZE(__LINE__) ": \"" literal "\""); } while (0)
 #else
-  #define TZN_ASSERT(cond, literal) /* No effect */
+  #define TZN_ASSERT(cond, literal) ((void)0)
 #endif
 
 #ifdef __GNUC__
@@ -38,7 +41,7 @@
   #ifdef TZN_DEBUG
     #define TZN_UNREACHABLE() TZN_ASSERT(0, "reached unreachable")
   #else
-    #define TZN_UNREACHABLE() /* No effect */ /* TODO Shouldn't be just ignored */
+    #define TZN_UNREACHABLE() ((void)0) /* TODO Shouldn't be just ignored */
   #endif
 #endif
 

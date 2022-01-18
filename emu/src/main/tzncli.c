@@ -45,6 +45,7 @@ void memoryInit(U8* memory, U16 size)
 int
 main(void)
 {
+  TZN_ASSERT(0, "fuck");
   tzn_CpuRegisterMemoryInitCallback(memoryInit);
   tzn_CpuExec();
 
