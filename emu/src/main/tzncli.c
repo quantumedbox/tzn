@@ -36,7 +36,7 @@ U8 test[] = {
 
 /* Sets CPU initial RAM state on startup */
 static
-void memoryInit(U8* memory, U16 size)
+void memInit(U8* memory, U16 size)
 {
   U16 idx = sizeof(test);
   TZN_ASSERT(size >= sizeof(test), "Cannot fit ROM in RAM");
@@ -47,8 +47,8 @@ void memoryInit(U8* memory, U16 size)
 int
 main(void)
 {
-  tzn_CpuRegisterMemoryInitCallback(memoryInit);
-  tzn_CpuExec();
+  tznCpuMc(memInit);
+  tznCpuEx();
 
   return 0;
 }

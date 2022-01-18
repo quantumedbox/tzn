@@ -6,8 +6,8 @@
 #define CONTROLLER_SHUTDOWN 0x01
 #define CONTROLLER_RESTART  0x02
 
-void tzn_ControllerInit(void);
-void tzn_ControllerWrite(U8 byte);
-U8 tzn_ControllerRead(void);
+void tznCtrIn(void);
+void tznCtrWr(U8 byte);
+U8 tznCtrRd(void);
 
 #endif

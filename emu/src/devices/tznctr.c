@@ -1,27 +1,27 @@
 #include "tznctr.h"
 
-extern void tzn_ControllerInitImpl(void);
-extern TZN_NORETURN void tzn_ControllerShutdown(void);
-extern void tzn_ControllerReset(void);
+extern void tznCtrII(void); /* Internal init */
+extern TZN_NORETURN void tznCtrSD(void); /* Shutdown */
+extern void tznCtrRS(void); /* Reset */
 
 void
-tzn_ControllerInit(void)
+tznCtrIn(void)
 {
-  tzn_ControllerInitImpl();
+  tznCtrII();
 }
 
 void
-tzn_ControllerWrite(U8 byte)
+tznCtrWr(U8 byte)
 {
   switch (byte)
   {
     case CONTROLLER_SHUTDOWN:
     {
-      tzn_ControllerShutdown();
+      tznCtrSD();
     }
     case CONTROLLER_RESTART:
     {
-      tzn_ControllerReset();
+      tznCtrRS();
     }
     default:
     {
@@ -31,7 +31,7 @@ tzn_ControllerWrite(U8 byte)
 }
 
 U8
-tzn_ControllerRead(void)
+tznCtrRd(void)
 {
   return 0;
 }

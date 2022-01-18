@@ -8,14 +8,14 @@
 #include "tzndvc.h"
 
 void
-tzn_ControllerInitImpl(void)
+tznCtrII(void)
 {
   /* Empty */
 }
 
 TZN_NORETURN
 void
-tzn_ControllerShutdown(void)
+tznCtrSD(void)
 {
   exit(EXIT_SUCCESS);
 }
@@ -25,7 +25,7 @@ tzn_ControllerShutdown(void)
 /* TODO Reset device state */
 
 void
-tzn_ControllerReset(void)
+tznCtrRS(void)
 {
-  tzn_CpuRestart();
+  tznCpuRs();
 }

@@ -4,6 +4,8 @@
 #include "tzntyp.h"
 #include "tznlmt.h"
 
+/* TODO Shorten macro names to 8 chars */
+
 #define TZN_VOID ((void*)0)
 
 #ifdef __GNUC__
@@ -26,7 +28,7 @@
 #define TZN_STRINGIZE(x) TZN_STRINGIZE_INTERNAL(x)
 
 #ifndef TZN_RELEASE
-  #define TZN_ASSERT(cond, literal) do { if (!(cond)) tzn_Error(__FILE__ ":" TZN_STRINGIZE(__LINE__) ": \"" literal "\""); } while (0)
+  #define TZN_ASSERT(cond, literal) do { if (!(cond)) tznError(__FILE__ ":" TZN_STRINGIZE(__LINE__) ": \"" literal "\""); } while (0)
 #else
   #define TZN_ASSERT(cond, literal) ((void)0)
 #endif
@@ -76,9 +78,9 @@
 #endif
 
 #define U16_SUB_I8(subtrahend, subtractor) \
-  if (rel_addr & 0x80) \
-    program_counter = (program_counter - (U8)~rel_addr) - 1; \
+  if (subtractor & 0x80) \
+    subtrahend = (subtrahend - (U8)~subtractor) - 1; \
   else \
-    program_counter += rel_addr;
+    subtrahend += subtractor;
 
 #endif

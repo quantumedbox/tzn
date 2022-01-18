@@ -7,7 +7,7 @@
 
 TZN_NORETURN
 void
-tzn_Error(const char* literal)
+tznError(const char* literal)
 {
   fputs("[error: ", stderr);
   fputs(literal, stderr);

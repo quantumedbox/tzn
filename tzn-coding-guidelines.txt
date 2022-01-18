@@ -1,10 +1,15 @@
+- Follow C 89/90 guidelines as strictly as possible:
+  - Prefix every source with "tzn" and suffix with ".h" or ".c" 
+  - All source / header files should have names with 8 symbols at most, which leaves 3 symbols after "tzn" prefix and file extension
+  - Always check nullity of function pointers by "if (ptr)", not with TZN_NULL
 
-Follow C 89/90 guidelines as strictly as possible:
-  -- Prefix every source with "tzn" and suffix with ".h" or ".c" 
-  -- All source / header files should have names with 8 symbols at most, which leaves 3 symbols after "tzn" prefix and file extension
-  -- Always check nullity of function pointers by "if (ptr)", not with TZN_NULL
+- Archaic C:
+  - Even though 89/90 guidelines specify that identifiers could be at least 63 characters in isn't the fact on all pre 89/90 compilers
+     Because of that all identifier should have 8 characters at most which leaves 5 significant chars after "tzn" prefix
 
-Respect SEI CERT C Coding Standard!
+- Respect SEI CERT C Coding Standard!
 
-Style:
-  -- Each indentation level is signaled by 2 spaces 
+- Style:
+  - All variables and function definitions should have comment explaining what their name abbreviates
+  - Each indentation level is signaled by 2 spaces 
+  - Enums should not end with comma

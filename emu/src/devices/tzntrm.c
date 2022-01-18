@@ -1,54 +1,54 @@
 #include "tzntrm.h"
 #include "tznstd.h"
 
-static U8 terminal_state;
+static U8 state;
 
 /* Used as temporary for character getting */
 static U8 lookup_x;
 static U8 lookup_y;
 
 /* Implementation dependent functions, compile against something that implements them */
-extern void tzn_TerminalInitImpl(void);
-extern void tzn_TerminalSetCursorHorizontalPos(U8 pos);
-extern void tzn_TerminalSetCursorVerticalPos(U8 pos);
-extern void tzn_TerminalSetCursorVisibility(U8 state);
-extern TZN_LIKELY void tzn_TerminalPutChar(U8 ch);
-extern U8 tzn_TerminalGetChar(U8 horizontal, U8 vertical);
+extern void tznTrmII(void); /* Internal init */
+extern void tznTrmCX(U8 pos); /* Set cursor X pos */
+extern void tznTrmCY(U8 pos); /* Set cursor Y pos */
+extern void tznTrmCV(U8 state); /* Set cursor visibility */
+extern TZN_LIKELY void tznTrmPC(U8 ch); /* Put char */
+extern U8 tznTrmGC(U8 x, U8 y); /* Get char */
 
-extern U8 tzn_terminal_width;
-extern U8 tzn_terminal_height;
+extern U8 tznTrmSX;
+extern U8 tznTrmSY;
 
 enum {
   tsNone,
-  tsWaitSetCursorHorizontalPos,
-  tsWaitSetCursorVerticalPos,
-  tsWaitSetCursorVisibility,
-  tsWaitPutCharacter,
-  tsWaitPutString,
-  tsSendDisplayWidth,
-  tsSendDisplayHeight,
-  tsGetCharWaitHorizontalPos,
-  tsGetCharWaitVerticalPos,
-  tsGetCharSendChar
+  tsWSCurX, /* Wait Set Cursor X */
+  tsWSCurY, /* Wait Set Cursor Y */
+  tsWSCurV, /* Wait Set Cursor visibility */
+  tsWPutCh, /* Wait Put Char */
+  tsWPutSt, /* Wait Put String */
+  tsSDisSX, /* Send Display Size X */
+  tsSDisSY, /* Send Display Size Y */
+  tsWChX,   /* Wait Char X */
+  tsWChY,   /* Wait Char Y */
+  tsSCh     /* Send Char */
 };
 
 void
-tzn_TerminalInit(void)
+tznTrmIn(void)
 {
-  terminal_state = tsNone;
-  tzn_TerminalInitImpl();
+  state = tsNone;
+  tznTrmII();
 }
 
 TZN_LIKELY
 void
-tzn_TerminalWrite(U8 byte)
+tznTrmWr(U8 byte)
 {
   if (byte == TERMINAL_RESET) {
-    terminal_state = tsNone;
+    state = tsNone;
     return;
   }
 
-  switch (terminal_state) {
+  switch (state) {
 
     /* Expecting to start new command sequence */
     case tsNone:
@@ -57,37 +57,37 @@ tzn_TerminalWrite(U8 byte)
       {
         case TERMINAL_SET_CURSOR_HORIZONTRAL:
         {
-          terminal_state = tsWaitSetCursorHorizontalPos;
+          state = tsWSCurX;
           break;
         }
         case TERMINAL_SET_CURSOR_VERTICAL:
         {
-          terminal_state = tsWaitSetCursorVerticalPos;
+          state = tsWSCurY;
           break;
         }
         case TERMINAL_SET_CURSOR_VISIBILITY:
         {
-          terminal_state = tsWaitSetCursorVisibility;
+          state = tsWSCurV;
           break;
         }
         case TERMINAL_PUT_CHAR:
         {
-          terminal_state = tsWaitPutCharacter;
+          state = tsWPutCh;
           break;
         }
         case TERMINAL_PUT_STRING:
         {
-          terminal_state = tsWaitPutString;
+          state = tsWPutSt; /* Wair Put String */
           break;
         }
         case TERMINAL_GET_DISPLAY_SIZE:
         {
-          terminal_state = tsSendDisplayWidth;
+          state = tsSDisSX; /* Send */
           break;
         }
         case TERMINAL_GET_CHAR:
         {
-          terminal_state = tsGetCharWaitHorizontalPos;
+          state = tsWChX;  /* Get Char Wait X */
           break;
         }
       }
@@ -95,86 +95,86 @@ tzn_TerminalWrite(U8 byte)
     }
 
     /* Set cursor horizontal pos */
-    case tsWaitSetCursorHorizontalPos:
+    case tsWSCurX:
     {
-      tzn_TerminalSetCursorHorizontalPos(byte);
-      terminal_state = tsNone;
+      tznTrmCX(byte);
+      state = tsNone;
       break;
     }
 
     /* Set cursor vertical pos */
-    case tsWaitSetCursorVerticalPos:
+    case tsWSCurY:
     {
-      tzn_TerminalSetCursorVerticalPos(byte);
-      terminal_state = tsNone;
+      tznTrmCY(byte);
+      state = tsNone;
       break;
     }
 
     /* Print character at cursor position, move cursor forward */
-    case tsWaitSetCursorVisibility:
+    case tsWSCurV:
     {
-      tzn_TerminalSetCursorVisibility(byte);
-      terminal_state = tsNone;
+      tznTrmCV(byte);
+      state = tsNone;
       break;
     }
 
     /* Print character at cursor position, move cursor forward */
-    case tsWaitPutCharacter:
+    case tsWPutCh:
     {
-      tzn_TerminalPutChar(byte);
-      terminal_state = tsNone;
+      tznTrmPC(byte);
+      state = tsNone;
       break;
     }
 
     /* Print character at cursor position, move cursor forward, wait next character of 0x00 to stop */
-    case tsWaitPutString:
+    case tsWPutSt: /* Wair Put String */
     {
-      tzn_TerminalPutChar(byte);
+      tznTrmPC(byte);
       break;
     }
 
     /* Set temporary for x position, await to send y position */
-    case tsGetCharWaitHorizontalPos:
+    case tsWChX:  /* Get Char Wait X */
     {
       lookup_x = byte;
-      terminal_state = tsGetCharWaitVerticalPos;
+      state = tsWChY;
       break;
     }
 
     /* Set temporary for y position, await reading of char */
-    case tsGetCharWaitVerticalPos:
+    case tsWChY:
     {
       lookup_y = byte;
-      terminal_state = tsGetCharSendChar;
+      state = tsSCh; /* */;
       break;
     }
   }
 }
 
 U8
-tzn_TerminalRead(void)
+tznTrmRd(void)
 {
-  switch (terminal_state) {
+  switch (state) {
 
-    /* Send display width, await to send height */
-    case tsSendDisplayWidth:
+    /* Send display widtht await to send height */
+    case tsSDisSX: /* Send Display Size X */
     {
-      terminal_state = tsSendDisplayHeight;
-      return tzn_terminal_width;
+      state = tsSDisSY;
+      return tznTrmSX;
     }
 
     /* Send display height, end command sequence */
-    case tsSendDisplayHeight:
+    case tsSDisSY:
     {
-      terminal_state = tsNone;
-      return tzn_terminal_height;
+      state = tsNone;
+      return tznTrmSY;
     }
 
     /* Send character at previously specified position, end command sequence */
-    case tsGetCharSendChar:
+    case tsSCh    /* */:
     {
-      terminal_state = tsNone;
-      return tzn_TerminalGetChar(lookup_x, lookup_y);
+      state = tsNone;
+      return tznTrmGC(lookup_x, lookup_y);
     }
 
     /*

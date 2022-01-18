@@ -6,98 +6,97 @@
 
 #include "tznstd.h"
 
-#define TERMINAL_WIDTH 80
-#define TERMINAL_HEIGHT 25
+#define T_WIDTH 80
+#define T_HEIGHT 25
 
-#define ESCAPE_SEQUENCE "\033["
-#define HIDE_CURSOR ESCAPE_SEQUENCE "?25l"
-#define SHOW_CURSOR ESCAPE_SEQUENCE "?25h"
-#define CLEAR_SCREEN ESCAPE_SEQUENCE "2J"
+#define ESC_SEQ "\033["
+#define HIDE_CUR ESC_SEQ "?25l"
+#define SHOW_CUR ESC_SEQ "?25h"
+#define CLR_SCR ESC_SEQ "2J"
 
-const U8 tzn_terminal_width = TERMINAL_WIDTH;
-const U8 tzn_terminal_height = TERMINAL_HEIGHT;
+const U8 tznTrmSX = T_WIDTH; /* Width */
+const U8 tznTrmSY = T_HEIGHT; /* Height */
 
-static U8 terminal_cursor_horizontal_pos;
-static U8 terminal_cursor_vertical_pos;
-/* static U8 terminal_cursor_visibility; */
+static U8 cur_xpos;
+static U8 cur_ypos;
 
-static U8 screen_map[TERMINAL_WIDTH * TERMINAL_HEIGHT];
+static U8 scr_map[T_WIDTH * T_HEIGHT];
 
 TZN_LIKELY
 static
 void
-tzn_UpdateCursorPos(void)
+updCurXY(void)
 {
   fprintf(
     stdout,
-    ESCAPE_SEQUENCE "%d;%dH",
-    terminal_cursor_vertical_pos,
-    terminal_cursor_horizontal_pos
+    ESC_SEQ "%d;%dH",
+    cur_ypos,
+    cur_xpos
   );
 }
 
 void
-tzn_TerminalInitImpl(void)
+tznTrmII(void)
 {
   U16 idx;
 
-  terminal_cursor_horizontal_pos = 0;
-  terminal_cursor_vertical_pos = 0;
-  tzn_UpdateCursorPos();
+  cur_xpos = 0;
+  cur_ypos = 0;
+  updCurXY();
 
-  fputs(CLEAR_SCREEN, stdout);
+  fputs(CLR_SCR, stdout);
 
-  idx = TERMINAL_WIDTH * TERMINAL_HEIGHT;
+  idx = T_WIDTH * T_HEIGHT;
   while (idx--)
-    screen_map[idx] = 0;
+    scr_map[idx] = 0;
 }
 
 void
-tzn_TerminalSetCursorHorizontalPos(U8 pos)
+tznTrmCX(U8 pos)
 {
-  while (pos >= tzn_terminal_width)
-    pos -= tzn_terminal_width;
-  terminal_cursor_horizontal_pos = pos;
-  tzn_UpdateCursorPos();
+  while (pos >= tznTrmSX)
+    pos -= tznTrmSX;
+  cur_xpos = pos;
+  updCurXY();
 }
 
 void
-tzn_TerminalSetCursorVerticalPos(U8 pos)
+tznTrmCY(U8 pos)
 {
-  while (pos >= tzn_terminal_height)
-    pos -= tzn_terminal_height;
-  terminal_cursor_vertical_pos = pos;
-  tzn_UpdateCursorPos();
+  while (pos >= tznTrmSY)
+    pos -= tznTrmSY;
+  cur_ypos = pos;
+  updCurXY();
 }
 
 /* NOTE These sequences aren't part of standard VT100 and might not be available */
 void
-tzn_TerminalSetCursorVisibility(U8 state)
+tznTrmCV(U8 state)
 {
   if (state == 0x01)
-    fputs(SHOW_CURSOR, stdout);
+    fputs(SHOW_CUR, stdout);
   else
-    fputs(HIDE_CURSOR, stdout);
+    fputs(HIDE_CUR, stdout);
 }
 
 TZN_LIKELY
 void
-tzn_TerminalPutChar(U8 ch)
+tznTrmPC(U8 ch)
 {
   /* TODO Current implementation is suboptimal, but we need to prevent terminal from evaluating newlines and other symbols */
-  screen_map[terminal_cursor_horizontal_pos + terminal_cursor_vertical_pos * tzn_terminal_width] = ch;
+  scr_map[cur_xpos + cur_ypos * tznTrmSX] = ch;
   fputc(ch, stdout);
-  if (tzn_terminal_width == (++terminal_cursor_horizontal_pos))
+  if (tznTrmSX == (++cur_xpos))
   {
-    terminal_cursor_horizontal_pos = 0;
-    if (tzn_terminal_height == (++terminal_cursor_vertical_pos))
-      terminal_cursor_vertical_pos = 0;
+    cur_xpos = 0;
+    if (tznTrmSY == (++cur_ypos))
+      cur_ypos = 0;
   }
-  tzn_UpdateCursorPos();
+  updCurXY();
 }
 
 U8
-tzn_TerminalGetChar(U8 horizontal, U8 vertical)
+tznTrmGC(U8 x, U8 y)
 {
-  return screen_map[horizontal + vertical * tzn_terminal_width];
+  return scr_map[x + y * tznTrmSX];
 }

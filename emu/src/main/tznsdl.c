@@ -40,11 +40,11 @@ main(void)
   };
 
   tzn_WriteMemory(test_code, TZN_MEMORY_RAM_START, sizeof test_code);
-  tzn_CpuExec();
+  tznCpuEx();
 
   /*
   if (SDL_Init(SDL_INIT_VIDEO))
-    tzn_Error("Error initializing SDL");
+    tznError("Error initializing SDL");
 
   if (!(handle.window = SDL_CreateWindow(
       "tzn-emu",
@@ -53,13 +53,13 @@ main(void)
       TZN_DISPLAY_PIXEL_WIDTH,
       TZN_DISPLAY_PIXEL_HEIGHT,
       SDL_WINDOW_SHOWN)))
-    tzn_Error("Error creating window");
+    tznError("Error creating window");
 
   if (!(handle.renderer = SDL_CreateRenderer(handle.window, -1, SDL_RENDERER_ACCELERATED)))
-    tzn_Error("Error creating renderer");
+    tznError("Error creating renderer");
 
   if (atexit(SdlDeinit))
-    tzn_Error("Error setting atexit");
+    tznError("Error setting atexit");
   */
   return 0;
 }

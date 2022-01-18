@@ -12,8 +12,8 @@
 #define TERMINAL_GET_DISPLAY_SIZE       0x20
 #define TERMINAL_GET_CHAR               0x21
 
-void tzn_TerminalInit(void);
-TZN_LIKELY void tzn_TerminalWrite(U8 byte);
-U8 tzn_TerminalRead(void);
+void tznTrmIn(void);
+TZN_LIKELY void tznTrmWr(U8 byte);
+U8 tznTrmRd(void);
 
 #endif

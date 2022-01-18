@@ -3,10 +3,10 @@
 
 #include "tznstd.h"
 
-void tzn_DevicesInit(void);
+void tznDvcIn(void);
 
-TZN_LIKELY void tzn_DeviceWrite(U8 byte, U8 device);
+TZN_LIKELY void tznDvcWr(U8 byte, U8 device);
 
-TZN_LIKELY U8 tzn_DeviceRead(U8 device);
+TZN_LIKELY U8 tznDvcRd(U8 device);
 
 #endif

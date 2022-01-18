@@ -18,58 +18,58 @@ enum {
 
 /* Initializing is setting devices up in their startup state */
 void
-tzn_DevicesInit(void)
+tznDvcIn(void)
 {
 #ifdef TZN_HAS_TERMINAL
-  tzn_TerminalInit();
+  tznTrmIn();
 #endif
-  tzn_ControllerInit();
+  tznCtrIn();
 }
 
 TZN_LIKELY
 void
-tzn_DeviceWrite(U8 byte, U8 device)
+tznDvcWr(U8 byte, U8 device)
 {
   switch (device)
   {
 #ifdef TZN_HAS_TERMINAL
     case dvTerminal:
     {
-      tzn_TerminalWrite(byte);
+      tznTrmWr(byte);
       break;
     }
 #endif
     case dvController:
     {
-      tzn_ControllerWrite(byte);
+      tznCtrWr(byte);
       break;
     }
     default:
     {
-      tzn_Error("invalid device"); /* TEMP */
+      tznError("invalid device"); /* TEMP */
     }
   }
 }
 
 TZN_LIKELY
 U8
-tzn_DeviceRead(U8 device)
+tznDvcRd(U8 device)
 {
   switch (device)
   {
 #ifdef TZN_HAS_TERMINAL
     case dvTerminal:
     {
-      return tzn_TerminalRead();
+      return tznTrmRd();
     }
 #endif
     case dvController:
     {
-      return tzn_ControllerRead();
+      return tznCtrRd();
     }
     default:
     {
-      tzn_Error("invalid device"); /* TEMP */
+      tznError("invalid device"); /* TEMP */
     }
   }
 }
