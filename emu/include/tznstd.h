@@ -26,7 +26,7 @@
 #define TZN_STRINGIZE(x) TZN_STRINGIZE_INTERNAL(x)
 
 #ifndef TZN_RELEASE
-  #define TZN_ASSERT(cond, literal) do { if (!cond) tzn_Error(__FILE__ ":" TZN_STRINGIZE(__LINE__) ": \"" literal "\""); } while (0)
+  #define TZN_ASSERT(cond, literal) do { if (!(cond)) tzn_Error(__FILE__ ":" TZN_STRINGIZE(__LINE__) ": \"" literal "\""); } while (0)
 #else
   #define TZN_ASSERT(cond, literal) ((void)0)
 #endif
