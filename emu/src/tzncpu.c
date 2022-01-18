@@ -78,87 +78,99 @@ tznCpuEx(void)
 #endif
     switch (memory[pgc_r++])
     {
-      case ZEROA:
+      case iMOV0A:
       {
         regs[rgA] = 0;
         break;
       }
-      case SETA:
+      case iMOVIA:
       {
         regs[rgA] = memory[pgc_r++];
         break;
       }
-      case SETB:
+      case iMOVIB:
       {
         regs[rgB] = memory[pgc_r++];
         break;
       }
-      case SETC:
+      case iMOVIC:
       {
         regs[rgC] = memory[pgc_r++];
         break;
       }
-      case SETD:
+      case iMOVID:
       {
         regs[rgD] = memory[pgc_r++];
         break;
       }
-      case MOVAB:
+      case iMOVAB:
       {
         regs[rgB] = regs[rgA];
         break;
       }
-      case MOVAC:
+      case iMOVAC:
       {
         regs[rgC] = regs[rgA];
         break;
       }
-      case MOVAD:
+      case iMOVAD:
       {
         regs[rgD] = regs[rgA];
         break;
       }
-      case MOVBA:
+      case iMOVBA:
       {
         regs[rgA] = regs[rgB];
         break;
       }
-      case MOVCA:
+      case iMOVCA:
       {
         regs[rgA] = regs[rgC];
         break;
       }
-      case MOVDA:
+      case iMOVDA:
       {
         regs[rgA] = regs[rgD];
         break;
       }
-      case MOVMA:
+      case iMOVMA:
       {
         regs[rgA] = memory[U16_INIT(regs[rgB], regs[rgC])];
         break;
       }
-      case INCA:
+      case iINCA:
       {
         regs[rgA]++;
         status_r = regs[rgA] == U8_MIN;
         break;
       }
-      case DECA:
+      case iDECA:
       {
         regs[rgA]--;
         status_r = regs[rgA] == U8_MAX;
         break;
       }
-      case INCBC:
+      case iINCBC:
       {
+        /* TODO
+          Cast [B C] to U16 and use native arithmetic
+          Problem with that is that Big Endian platform will require more than just casting
+          One possibly solution tho is to have [B C] be ordered in memory depending on endianess of target
+
+          For example by:
+            #if TZN_ISLE == 1
+              enum { rgA, rgB, rgC, rgD, rgSL, rgSH };
+            #else
+              enum { rgA, rgC, rgB, rgD, rgL, rgH };
+            #endif
+        */
         if (++regs[rgB] == U8_MIN)
           status_r = ++regs[rgC] == U8_MIN;
         else
           status_r = 0x00;
         break;
       }
-      case DECAB:
+      case iDECBC:
       {
         if (--regs[rgB] == U8_MAX)
           status_r = --regs[rgC] == U8_MAX;
@@ -166,81 +178,81 @@ tznCpuEx(void)
           status_r = 0x00;
         break;
       }
-      case FLP:
+      case iFLP:
       {
         status_r ^= 0x01;
         break;
       }
-      case ADDI:
+      case iADDI:
       {
         regs[rgA] += memory[pgc_r++];
         status_r = regs[rgA] == U8_MIN;
         break;
       }
-      case ADDB:
+      case iADDB:
       {
         regs[rgA] += regs[rgB];
         status_r = regs[rgA] == U8_MIN;
         break;
       }
-      case SUBI:
+      case iSUBI:
       {
         U8 res = regs[rgA] - memory[pgc_r++];
         status_r = res > regs[rgA];
         regs[rgA] = res;
         break;
       }
-      case SUBB:
+      case iSUBB:
       {
         U8 res = regs[rgA] - regs[rgB];
         status_r = res > regs[rgA];
         regs[rgA] = res;
         break;
       }
-      case EQLI:
+      case iEQLI:
       {
         status_r = regs[rgA] == memory[pgc_r++];
         break;
       }
-      case EQLB:
+      case iEQLB:
       {
         status_r = regs[rgA] == regs[rgB];
         break;
       }
-      case JMPRI:
+      case iJMPRI:
       {
         U8 rel_addr = memory[pgc_r++];
         U16_S_I8(pgc_r, rel_addr);
         break;
       }
-      case JMPCRI:
+      case iJMPCRI:
       {
         U8 rel_addr = memory[pgc_r++] * status_r;
         U16_S_I8(pgc_r, rel_addr);
         break;
       }
-      case DVWI:
+      case iDVCWI:
       {
         tznDvcWr(memory[pgc_r++], regs[rgD]);
         break;
       }
-      case DVWA:
+      case iDVCWA:
       {
         tznDvcWr(regs[rgA], regs[rgD]);
         break;
       }
-      case DVWM:
+      case iDVCWM:
       {
         tznDvcWr(memory[U16_INIT(regs[rgB], regs[rgC])], regs[rgD]);
         break;
       }
-      case DVR:
+      case iDVCRA:
       {
         regs[rgA] = tznDvcRd(regs[rgD]);
         break;
       }
       default: {
-        tznError("instruction not implemented");
+        TZN_ASRT(0, "instruction not implemented");
       }
     }
     if (shdl_res) {
