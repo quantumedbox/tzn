@@ -6,12 +6,21 @@
 
 typedef void (*CpuMemCB)(U8* memory, U16 size);
 
-/* Signal to CPU that it should reset itself and all attached devices */
-void tznCpuRs(void);
+/*
+  @brief  Enter CPU's execution loop
+  @warn   Previous call to tznCpuMc() is required for CPU to have memory initialized
+*/
+void TZN_NORE tznCpuEx(void);
 
-/* Register function that should initialize CPU internal memory on startup */
+/*
+  @brief  Register function that should initialize CPU internal memory on startup
+*/
 void tznCpuMc(CpuMemCB);
 
-void TZN_NORE tznCpuEx(void);
+/*
+  @brief  Signal to CPU that it should reset itself and all attached devices
+  @warn   Should only be called inside tznCpuEx() running
+*/
+void tznCpuRs(void);
 
 #endif
