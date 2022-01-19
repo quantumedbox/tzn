@@ -1,9 +1,7 @@
 /*
   System communication abstraction
 
-  TODO
-    - Abstract all of libc in here
-    - Implement memset / memcpy 
+  TODO Abstract all of libc in here
 */
 
 #ifndef TZN_SYSH

@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <setjmp.h>
 
 #include "tzncpu.h"
 #include "tznstd.h"
@@ -7,7 +6,7 @@
 #include "tzndvc.h"
 #include "tznerr.h"
 
-static jmp_buf restart;
+static U8 shdl_res; /* Should Restart */
 static CpuMemCB memincb; /* Memory Init Callback */
 
 enum { rgA, rgB, rgC, rgD, rgL, rgH };
@@ -23,7 +22,7 @@ tznCpuIn(U8* memory)
 void
 tznCpuRs(void)
 {
-  longjmp(restart, 0);
+  shdl_res = 1;
 }
 
 void
@@ -46,8 +45,6 @@ tznCpuEx(void)
   register U16 pgc_r; /* Program Counter Registers */
   U8 regs[TZN_REGG]; /* Registers */
   U8 status_r; /* Status Register */
-
-  setjmp(restart);
 
   tznCpuIn(memory);
   tznDvcIn();
@@ -258,6 +255,12 @@ tznCpuEx(void)
       default: {
         TZN_ASRT(0, "instruction not implemented");
       }
+    }
+    if (shdl_res) {
+      tznCpuIn(memory);
+      tznDvcIn();
+      INIT_REGISTER_STATE();
+      shdl_res = 0;
     }
   }
 #undef INIT_REGISTER_STATE
