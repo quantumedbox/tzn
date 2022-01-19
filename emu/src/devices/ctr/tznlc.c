@@ -7,6 +7,8 @@
 #include "tzncpu.h"
 #include "tzndvc.h"
 
+extern void tznCpuRs(void);
+
 void
 tznCtrII(void)
 {
