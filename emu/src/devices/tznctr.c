@@ -4,12 +4,14 @@ extern void tznCtrII(void); /* Internal init */
 extern TZN_NORE void tznCtrSD(void); /* Shutdown */
 extern void tznCtrRS(void); /* Reset */
 
+/* Internal Initialization */
 void
 tznCtrIn(void)
 {
   tznCtrII();
 }
 
+/* Write */
 void
 tznCtrWr(U8 byte)
 {
@@ -30,6 +32,7 @@ tznCtrWr(U8 byte)
   }
 }
 
+/* Read */
 U8
 tznCtrRd(void)
 {
