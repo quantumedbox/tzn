@@ -1,5 +1,5 @@
-#ifndef TZN_CONTROLLER_H
-#define TZN_CONTROLLER_H
+#ifndef TZN_CTRH
+#define TZN_CTRH
 
 #include "tznstd.h"
 

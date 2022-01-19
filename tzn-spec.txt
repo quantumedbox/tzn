@@ -43,11 +43,11 @@
         Second bit: Carry / Overflow / Underflow
         Rest: Reserved
     PC:
-      7 -- CL -- Program Counter Low
-      8 -- CH -- Program Counter High
+      7 -- PL -- Program Counter Low
+      8 -- PH -- Program Counter High
 
   *On startup it's guaranteed that A B C D F registers will all have 0x00 stored
-  *On startup it's guaranteed that [CL CH] will have 0x0100 value to start execution at
+  *On startup it's guaranteed that [PL PH] will have 0x0100 value to start execution at
   *On startup it's guaranteed that [SL SH] will have highest point in RAM (0xFFFF)
   *Design allows more for registers, but new instructions must be implemented to utilize them, check devices for availability
 

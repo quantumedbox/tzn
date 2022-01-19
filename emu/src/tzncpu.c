@@ -10,7 +10,7 @@
 static jmp_buf restart;
 static CpuMemCB memincb; /* Memory Init Callback */
 
-enum { rgA, rgB, rgC, rgD, rgL, rgH };
+enum { rgA, rgB, rgC, rgD, rgSL, rgSH };
 
 static
 void
@@ -55,8 +55,8 @@ tznCpuEx(void)
   tznMeSet(regs, sizeof(regs[0]) * TZN_REGG, 0x00);
   pgc_r = TZN_MRMS;
   status_r = 0x00;
-  regs[rgL] = U16_LOW(TZN_SPIN);
-  regs[rgH] = U16_HIGH(TZN_SPIN);
+  regs[rgSL] = U16_LOW(TZN_SPIN);
+  regs[rgSH] = U16_HIGH(TZN_SPIN);
 
   while (1)
   {
@@ -76,29 +76,11 @@ tznCpuEx(void)
 #endif
     switch (memory[pgc_r++])
     {
+      /* Register Based Instructions */
+
       case iMOV0A:
       {
         regs[rgA] = 0;
-        break;
-      }
-      case iMOVIA:
-      {
-        regs[rgA] = memory[pgc_r++];
-        break;
-      }
-      case iMOVIB:
-      {
-        regs[rgB] = memory[pgc_r++];
-        break;
-      }
-      case iMOVIC:
-      {
-        regs[rgC] = memory[pgc_r++];
-        break;
-      }
-      case iMOVID:
-      {
-        regs[rgD] = memory[pgc_r++];
         break;
       }
       case iMOVAB:
@@ -116,6 +98,23 @@ tznCpuEx(void)
         regs[rgD] = regs[rgA];
         break;
       }
+      case iMOVASL:
+      {
+        regs[rgSL] = regs[rgA];
+        break;
+      }
+      case iMOVASH:
+      {
+        regs[rgSH] = regs[rgA];
+        break;
+      }
+      /* GAP */
+      case iMOVAM:
+      {
+        memory[U16_INIT(regs[rgB], regs[rgC])] = regs[rgA];
+        break;
+      }
+      /* GAP */
       case iMOVBA:
       {
         regs[rgA] = regs[rgB];
@@ -131,21 +130,76 @@ tznCpuEx(void)
         regs[rgA] = regs[rgD];
         break;
       }
+      case iMOVSLA:
+      {
+        regs[rgA] = regs[rgSL];
+        break;
+      }
+      case iMOVSHA:
+      {
+        regs[rgA] = regs[rgSH];
+        break;
+      }
+      /* GAP */
       case iMOVMA:
       {
         regs[rgA] = memory[U16_INIT(regs[rgB], regs[rgC])];
         break;
       }
+      case iADDB:
+      {
+        regs[rgA] += regs[rgB];
+        status_r = regs[rgA] == U8_MIN;
+        break;
+      }
+      case iSUBB:
+      {
+        U8 res = regs[rgA] - regs[rgB];
+        status_r = res > regs[rgA];
+        regs[rgA] = res;
+        break;
+      }
+      case iMULB:
+      {
+        /* TODO Status flag needs testing */
+        U8 res = regs[rgA] * regs[rgB];
+        status_r = ((regs[rgA] != 0) && ((res / regs[rgA]) != regs[rgB]));
+        regs[rgA] = res;
+        break;
+      }
+      case iDIVB:
+      {
+        /* TODO Handle division by zero */
+        regs[rgA] = regs[rgA] / regs[rgB];
+        break;
+      }
+      case iMODB:
+      {
+        /* TODO Handle division by zero */
+        regs[rgA] = regs[rgA] % regs[rgB];
+        break;
+      }
+      /* GAP */
+      /* GAP */
+      /* GAP */
       case iINCA:
       {
-        regs[rgA]++;
-        status_r = regs[rgA] == U8_MIN;
+        status_r = ++regs[rgA] == U8_MIN;
         break;
       }
       case iDECA:
       {
-        regs[rgA]--;
-        status_r = regs[rgA] == U8_MAX;
+        status_r = --regs[rgA] == U8_MAX;
+        break;
+      }
+      case iINCB:
+      {
+        status_r = ++regs[rgB] == U8_MIN;
+        break;
+      }
+      case iDECB:
+      {
+        status_r = --regs[rgB] == U8_MAX;
         break;
       }
       case iINCBC:
@@ -176,20 +230,145 @@ tznCpuEx(void)
           status_r = 0x00;
         break;
       }
+      case iINCM:
+      {
+        ++memory[U16_INIT(regs[rgB], regs[rgC])];
+        break;
+      }
+      case iDECM:
+      {
+        --memory[U16_INIT(regs[rgB], regs[rgC])];
+        break;
+      }
+      case iEQLB:
+      {
+        status_r = regs[rgA] == regs[rgB];
+        break;
+      }
+      case iCMPB:
+      {
+        status_r = regs[rgA] < regs[rgB];
+        break;
+      }
+      case iJMPRA:
+      {
+        U8 rel_addr = memory[regs[rgA]];
+        U16_S_I8(pgc_r, rel_addr);
+        break;
+      }
+      case iJMPCRA:
+      {
+        U8 rel_addr = memory[regs[rgA]] * status_r;
+        U16_S_I8(pgc_r, rel_addr);
+        break;
+      }
+      case iDVCWA:
+      {
+        tznDvcWr(regs[rgA], regs[rgD]);
+        break;
+      }
+      case iDVCWM:
+      {
+        tznDvcWr(memory[U16_INIT(regs[rgB], regs[rgC])], regs[rgD]);
+        break;
+      }
+      case iDVCRA:
+      {
+        regs[rgA] = tznDvcRd(regs[rgD]);
+        break;
+      }
+      case iDVCRM:
+      {
+        memory[U16_INIT(regs[rgB], regs[rgC])] = tznDvcRd(regs[rgD]);
+        break;
+      }
+      case iCALLBC:
+      {
+        /* Stack pointer should always point to free to rewrite spot */
+        /* TODO Assert for SP underflow on debug */
+        memory[U16_INIT(regs[rgSL], regs[rgSH])] = U16_LOW(pgc_r);
+        if (--regs[rgSL] == U8_MAX)
+          --regs[rgSH];
+        memory[U16_INIT(regs[rgSL], regs[rgSH])] = U16_HIGH(pgc_r);
+        if (--regs[rgSL] == U8_MAX)
+          --regs[rgSH];
+        pgc_r = U16_INIT(regs[rgB], regs[rgC]);
+        break;
+      }
+      case iRET:
+      {
+        if (++regs[rgSL] == U8_MIN)
+          ++regs[rgSH];
+        U16_HSET(pgc_r, memory[U16_INIT(regs[rgSL], regs[rgSH])]);
+        if (++regs[rgSL] == U8_MIN)
+          ++regs[rgSH];
+        U16_LSET(pgc_r, memory[U16_INIT(regs[rgSL], regs[rgSH])]);
+        break;
+      }
+      case iPUSHA:
+      {
+        memory[U16_INIT(regs[rgSL], regs[rgSH])] = regs[rgA];
+        if (--regs[rgSL] == U8_MAX)
+          --regs[rgSH];
+        break;
+      }
+      case iPUSHB:
+      {
+        memory[U16_INIT(regs[rgSL], regs[rgSH])] = regs[rgB];
+        if (--regs[rgSL] == U8_MAX)
+          --regs[rgSH];
+        break;
+      }
+      case iPOPA:
+      {
+        if (++regs[rgSL] == U8_MIN)
+          ++regs[rgSH];
+        regs[rgA] = memory[U16_INIT(regs[rgSL], regs[rgSH])];
+        break;
+      }
+      case iPOPB:
+      {
+        if (++regs[rgSL] == U8_MIN)
+          ++regs[rgSH];
+        regs[rgB] = memory[U16_INIT(regs[rgSL], regs[rgSH])];
+        break;
+      }
       case iFLP:
       {
         status_r ^= 0x01;
         break;
       }
+      case iCARTOL:
+      {
+        status_r = (status_r & 0xFE) | ((status_r >> 0x01) & 0x01);
+        break;
+      }
+
+      /* 1 Immediate Based Instructions */
+
+      case iMOVIA:
+      {
+        regs[rgA] = memory[pgc_r++];
+        break;
+      }
+      case iMOVIB:
+      {
+        regs[rgB] = memory[pgc_r++];
+        break;
+      }
+      case iMOVIC:
+      {
+        regs[rgC] = memory[pgc_r++];
+        break;
+      }
+      case iMOVID:
+      {
+        regs[rgD] = memory[pgc_r++];
+        break;
+      }
       case iADDI:
       {
         regs[rgA] += memory[pgc_r++];
-        status_r = regs[rgA] == U8_MIN;
-        break;
-      }
-      case iADDB:
-      {
-        regs[rgA] += regs[rgB];
         status_r = regs[rgA] == U8_MIN;
         break;
       }
@@ -200,21 +379,9 @@ tznCpuEx(void)
         regs[rgA] = res;
         break;
       }
-      case iSUBB:
-      {
-        U8 res = regs[rgA] - regs[rgB];
-        status_r = res > regs[rgA];
-        regs[rgA] = res;
-        break;
-      }
       case iEQLI:
       {
         status_r = regs[rgA] == memory[pgc_r++];
-        break;
-      }
-      case iEQLB:
-      {
-        status_r = regs[rgA] == regs[rgB];
         break;
       }
       case iJMPRI:
@@ -232,21 +399,6 @@ tznCpuEx(void)
       case iDVCWI:
       {
         tznDvcWr(memory[pgc_r++], regs[rgD]);
-        break;
-      }
-      case iDVCWA:
-      {
-        tznDvcWr(regs[rgA], regs[rgD]);
-        break;
-      }
-      case iDVCWM:
-      {
-        tznDvcWr(memory[U16_INIT(regs[rgB], regs[rgC])], regs[rgD]);
-        break;
-      }
-      case iDVCRA:
-      {
-        regs[rgA] = tznDvcRd(regs[rgD]);
         break;
       }
       default: {

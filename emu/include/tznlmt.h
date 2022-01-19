@@ -1,5 +1,5 @@
-#ifndef TZN_LIMITS_H
-#define TZN_LIMITS_H
+#ifndef TZN_LMTH
+#define TZN_LMTH
 
 /*
   TODO It seems to be possible to not have ability to get full range of bytes when it's dependent on full range of possibe values

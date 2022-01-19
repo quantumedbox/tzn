@@ -1,5 +1,5 @@
-#ifndef TZN_TYPES_H
-#define TZN_TYPES_H
+#ifndef TZN_TYPH
+#define TZN_TYPH
 
 #define TZN_NULL ((void*)0)
 
@@ -13,7 +13,7 @@
 #define I32 signed int
 #define I64 signed long long int
 
-#define U8_MIN (U8)0
+#define U8_MIN ((U8)0)
 #define U8_MAX ((U8)-1)
 
 #define tznErr U8

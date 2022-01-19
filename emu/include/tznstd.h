@@ -1,5 +1,5 @@
-#ifndef TZN_COMPILER_H
-#define TZN_COMPILER_H
+#ifndef TZN_COMH
+#define TZN_COMH
 
 #include "tzntyp.h"
 #include "tznlmt.h"
@@ -52,21 +52,19 @@
   #endif
 #endif
 
-#if TZN_ISLE == 1
-  #define U16_INIT(low, high) (((U16)high << 8) | (U16)low)
-  #define U16_LOW(v) (v >> 8)
-  #define U16_HIGH(v) (v & 0x0F)
-#else
-  #define U16_INIT(low, high) (((U16)low << 8) | (U16)high)
-  #define U16_LOW(v) (v & 0x0F)
-  #define U16_HIGH(v) (v >> 8)
-#endif
+#define U16_INIT(low, high) (((U16)(high) << 8) | (U16)(low))
+#define U16_LOW(v) ((v) & 0x00FF)
+#define U16_HIGH(v) (((v) & 0xFF00) >> 8)
+/* Set low byte */
+#define U16_LSET(v, byte) do { v = (v & 0xFF00) | (byte); } while (0)
+/* Set high byte */
+#define U16_HSET(v, byte) do { v = (v & 0x00FF) | ((byte) << 8); } while (0)
 
 /* Subtraction of signed 8 bit integer from 16 unsigned one */
 #define U16_S_I8(sbtrhnd, sbtrctr) \
-  if (sbtrctr & 0x80) \
-    sbtrhnd = (sbtrhnd - (U8)~sbtrctr) - 1; \
+  if ((sbtrctr) & 0x80) \
+    (sbtrhnd) = ((sbtrhnd) - (U8)~(sbtrctr)) - 1; \
   else \
-    sbtrhnd += sbtrctr;
+    (sbtrhnd) += (sbtrctr);
 
 #endif

@@ -5,15 +5,6 @@
 /* TODO Do we need bit operators? Feels like shift left right might be quite handy */
 enum {
   /* First 64 instuctions are without immediate bytes */
-  iADDB,    /* Add B to A */
-  iSUBB,    /* Subtract B from A */
-  iMULB,
-  iDIVB,
-  iMODB,
-/*  iGAP,*/
-/*  iGAP,*/
-/*  iGAP,*/
- 
   iMOV0A,
   iMOVAB,   /* Move A to B */
   iMOVAC,   /* Move A to C */
@@ -32,13 +23,22 @@ enum {
 /*  iGAP,*/
   iMOVMA,   /* Move memory at [B C] to A */
 
+  iADDB,    /* Add B to A */
+  iSUBB,    /* Subtract B from A */
+  iMULB,    /* Multiply A and B */
+  iDIVB,    /* Divide A by B */
+  iMODB,    /* Modulo division of A by B */
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+
   iINCA,
-  iDECA,
   iINCB,
-  iDECB,
   iINCBC,
-  iDECBC,
   iINCM,
+  iDECA,
+  iDECB,
+  iDECBC,
   iDECM,
 
   iEQLB,    /* Equality of A and B, S is set to 0x01 on equality and 0x00 otherwise */
@@ -49,16 +49,15 @@ enum {
 
   iDVCWA,   /* Device write to D port where A register contains data to send */
   iDVCWM,   /* Device write to D port where byte at memory location [B C] is to send */
-
   iDVCRA,   /* Device read from D port to A register */
   iDVCRM,   /* Device read from D port to [B C] memory address */
 
-  iCALLBC,  /* Decrement Stack Pointer, store address of next instruction at stack then jump to [B C] */
+  iCALLBC,  /* Store [PL PH] at stack, jump to [B C] */
   iRET,
 
   iPUSHA,
-  iPOPA,
   iPUSHB,
+  iPOPA,
   iPOPB,
 
   iFLP,     /* Flip logic (first) bit of Status register */
@@ -83,21 +82,31 @@ enum {
 /*  iGAP,*/
 
   /* Next 64 instructions have 1 immediate byte */
-  iADDI,    /* Add immediate byte to A */
-  iSUBI,    /* Subtract immediate byte from A */
-  iMULI,
-  iDIVI,
-  iMODI,
-/*  iGAP,*/
-/*  iGAP,*/
-/*  iGAP,*/
-
   iMOVIA,   /* Move immediate byte to A */
   iMOVIB,   /* Move immediate byte to B */
   iMOVIC,   /* Move immediate byte to C */
   iMOVID,   /* Move immediate byte to D */
   iMOVISL,  /* Move immediate byte to SL */
   iMOVISH,  /* Move immediate byte to SH */
+/*  iGAP,*/
+/*  iGAP,*/
+
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+/*  iGAP,*/
+
+
+  iADDI,    /* Add immediate byte to A */
+  iSUBI,    /* Subtract immediate byte from A */
+  iMULI,
+  iDIVI,
+  iMODI,
+/*  iGAP,*/
 /*  iGAP,*/
 /*  iGAP,*/
 

@@ -1,5 +1,5 @@
-#ifndef TZN_CPU_H
-#define TZN_CPU_H
+#ifndef TZN_CPUH
+#define TZN_CPUH
 
 #include "tznstd.h"
 #include "tznops.h"

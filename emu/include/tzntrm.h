@@ -1,5 +1,5 @@
-#ifndef TZN_TERMINAL_H
-#define TZN_TERMINAL_H
+#ifndef TZN_TRMH
+#define TZN_TRMH
 
 #include "tznstd.h"
 

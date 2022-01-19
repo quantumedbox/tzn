@@ -1,5 +1,5 @@
-#ifndef TZN_DEVICE_H
-#define TZN_DEVICE_H
+#ifndef TZN_DVCH
+#define TZN_DVCH
 
 #include "tznstd.h"
 
