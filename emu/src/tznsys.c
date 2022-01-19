@@ -6,6 +6,12 @@
 
 /* TODO Abstract IO operations for portability on various libc implementations (Plan 9 for example) */
 
+void
+tznMeSet(void* mem, U16 size, U8 value)
+{
+  memset(mem, (size_t)size, value);
+}
+
 static
 tznBool
 flExists(const char* filename)

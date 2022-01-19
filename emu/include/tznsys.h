@@ -14,6 +14,8 @@
 #define TZN_FLIS 0x01 /* Ignore size */
 #define TZN_FLRW 0x02 /* Rewrite */
 
+void tznMeSet(void* mem, U16 size, U8 value);
+
 /*
   @brief  Read contents of file at filename to memory buffer of specified size
           Flags dictate behaviour

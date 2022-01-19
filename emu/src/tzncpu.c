@@ -52,9 +52,7 @@ tznCpuEx(void)
   tznCpuIn(memory);
   tznDvcIn();
 
-  U16 idx = TZN_REGG;
-  while (idx--)
-    regs[idx] = 0x00;
+  tznMeSet(regs, sizeof(regs[0]) * TZN_REGG, 0x00);
   pgc_r = TZN_MRMS;
   status_r = 0x00;
   regs[rgL] = U16_LOW(TZN_SPIN);
@@ -257,5 +255,4 @@ tznCpuEx(void)
     }
   }
   TZN_DEAD();
-#undef INIT_REGISTER_STATE
 }
