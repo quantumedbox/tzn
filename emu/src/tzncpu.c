@@ -17,7 +17,7 @@ void
 tznCpuIn(U8* memory)
 {
   TZN_ASRT(memincb, "NULL in memory init callback");
-  memincb(&memory[TZN_MRMS], TZN_MRMB);
+  memincb(memory, TZN_MTOB);
 }
 
 void
@@ -51,7 +51,7 @@ tznCpuEx(void)
 
   tznMeSet(memory, TZN_MTOB, 0x00);
   tznMeSet(regs, sizeof(regs[0]) * TZN_REGG, 0x00);
-  pgc_r = TZN_MRMS;
+  pgc_r = 0x00;
   status_r = 0x00;
   regs[rgSL] = U16_LOW(TZN_SPIN);
   regs[rgSH] = U16_HIGH(TZN_SPIN);

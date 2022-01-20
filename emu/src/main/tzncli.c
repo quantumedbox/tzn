@@ -63,11 +63,8 @@ main(int argc, char** argv)
     tznCpuMc(fileIn);
   }
   else
-  {
     tznCpuMc(defRomIn);
-  }
 
   tznCpuEx();
-
   return 0;
 }
