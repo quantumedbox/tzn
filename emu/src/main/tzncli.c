@@ -7,8 +7,7 @@ static const char* filename;
 
 U8 def_rom[] = {
   iMOVID, 0x01,
-  iMOVIB, 0x14,
-  iMOVIC, 0x01,
+  iMOVIB, 0x13,
   iDVCWI, 0x14,
   iDVCWM,
   iMOVMA,
@@ -30,7 +29,7 @@ U8 test_rom[] = {
   iMOVID, 0x01,
   iDVCWI, 0x13,
   iDVCWA,
-  iJMPRI, -17
+  iJMPRI, -16
 };
 
 /* Sets CPU initial RAM state on startup */
@@ -38,10 +37,8 @@ static
 void
 defRomIn(U8* memory, U16 size)
 {
-  U16 idx = sizeof(test_rom);
-  TZN_ASRT(size >= sizeof(test_rom), "Cannot fit ROM in RAM");
-  while (idx--)
-    memory[idx] = test_rom[idx];
+  TZN_ASRT(size >= sizeof(def_rom), "Cannot fit ROM in RAM");
+  tznMeCpy(memory, def_rom, sizeof(def_rom));
 }
 
 static
