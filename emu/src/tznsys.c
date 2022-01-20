@@ -6,6 +6,7 @@
 #include "tznstd.h"
 
 /* TODO Abstract IO operations for portability on various libc implementations (Plan 9 for example) */
+/* TODO Move to shared TZN code, not EMU specific base */
 
 void
 tznMeSet(void* mem, U16 size, U8 value)

@@ -108,13 +108,17 @@ tznCpuEx(void)
         regs[rgSH] = regs[rgA];
         break;
       }
+
       /* GAP */
+
       case iMOVAM:
       {
         memory[U16_INIT(regs[rgB], regs[rgC])] = regs[rgA];
         break;
       }
+
       /* GAP */
+
       case iMOVBA:
       {
         regs[rgA] = regs[rgB];
@@ -140,7 +144,9 @@ tznCpuEx(void)
         regs[rgA] = regs[rgSH];
         break;
       }
+
       /* GAP */
+
       case iMOVMA:
       {
         regs[rgA] = memory[U16_INIT(regs[rgB], regs[rgC])];
@@ -179,9 +185,11 @@ tznCpuEx(void)
         regs[rgA] = regs[rgA] % regs[rgB];
         break;
       }
+
       /* GAP */
       /* GAP */
       /* GAP */
+
       case iINCA:
       {
         status_r = ++regs[rgA] == U8_MIN;
@@ -366,6 +374,29 @@ tznCpuEx(void)
         regs[rgD] = memory[pgc_r++];
         break;
       }
+      case iMOVISL:
+      {
+        regs[rgSL] = memory[pgc_r++];
+        break;
+      }
+      case iMOVISH:
+      {
+        regs[rgSH] = memory[pgc_r++];
+        break;
+      }
+
+      /* GAP */
+      /* GAP */
+
+      /* GAP */
+      /* GAP */
+      /* GAP */
+      /* GAP */
+      /* GAP */
+      /* GAP */
+      /* GAP */
+      /* GAP */
+
       case iADDI:
       {
         regs[rgA] += memory[pgc_r++];
@@ -379,9 +410,49 @@ tznCpuEx(void)
         regs[rgA] = res;
         break;
       }
+      case iMULI:
+      {
+        /* TODO Status flag needs testing */
+        U8 mul = memory[pgc_r++];
+        U8 res = regs[rgA] * mul;
+        status_r = ((regs[rgA] != 0) && ((res / regs[rgA]) != mul));
+        regs[rgA] = res;
+        break;
+      }
+      case iDIVI:
+      {
+        /* TODO Handle division by zero */
+        regs[rgA] = regs[rgA] / memory[pgc_r++];
+        break;
+      }
+      case iMODI:
+      {
+        /* TODO Handle division by zero */
+        regs[rgA] = regs[rgA] % memory[pgc_r++];
+        break;
+      }
+
+      /* GAP */
+      /* GAP */
+      /* GAP */
+
+      /* GAP */
+      /* GAP */
+      /* GAP */
+      /* GAP */
+      /* GAP */
+      /* GAP */
+      /* GAP */
+      /* GAP */
+
       case iEQLI:
       {
         status_r = regs[rgA] == memory[pgc_r++];
+        break;
+      }
+      case iCMPI:
+      {
+        status_r = regs[rgA] < memory[pgc_r++];
         break;
       }
       case iJMPRI:
@@ -401,6 +472,56 @@ tznCpuEx(void)
         tznDvcWr(memory[pgc_r++], regs[rgD]);
         break;
       }
+      /* GAP */
+
+      /* GAP */
+      /* GAP */
+
+      case iCALLRI:
+      {
+        U8 rel_addr = memory[pgc_r++];
+        memory[U16_INIT(regs[rgSL], regs[rgSH])] = U16_LOW(pgc_r);
+        if (--regs[rgSL] == U8_MAX)
+          --regs[rgSH];
+        memory[U16_INIT(regs[rgSL], regs[rgSH])] = U16_HIGH(pgc_r);
+        if (--regs[rgSL] == U8_MAX)
+          --regs[rgSH];
+        U16_S_I8(pgc_r, rel_addr);
+        break;
+      }
+
+      /* 2 Immediate byte operating instructions */
+
+      case iMOVIMA:
+      {
+        regs[rgA] = memory[U16_INIT(memory[pgc_r], memory[pgc_r + 1])];
+        pgc_r += 2;
+        break;
+      }
+      case iMOVIAM:
+      {
+        memory[U16_INIT(memory[pgc_r], memory[pgc_r + 1])] = regs[rgA];
+        pgc_r += 2;
+        break;
+      }
+      case iDVCRIM:
+      {
+        memory[U16_INIT(memory[pgc_r], memory[pgc_r + 1])] = tznDvcRd(regs[rgD]);
+        pgc_r += 2;
+        break;
+      }
+      case iCALLI:
+      {
+        memory[U16_INIT(regs[rgSL], regs[rgSH])] = U16_LOW(pgc_r);
+        if (--regs[rgSL] == U8_MAX)
+          --regs[rgSH];
+        memory[U16_INIT(regs[rgSL], regs[rgSH])] = U16_HIGH(pgc_r);
+        if (--regs[rgSL] == U8_MAX)
+          --regs[rgSH];
+        pgc_r = memory[U16_INIT(memory[pgc_r], memory[pgc_r + 1])];
+        break;
+      }
+
       default: {
         TZN_ASRT(0, "instruction not implemented");
       }

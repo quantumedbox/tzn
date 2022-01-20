@@ -132,7 +132,7 @@ enum {
 /*  iGAP,*/
 /*  iGAP,*/
 
-  iCALLRI,  /* Decrement Stack Pointer, store address of next instruction at stack then perform relative jump by immediate byte as signed */
+  iCALLRI,  /* Store address at [SL SH] and perform relative jump to immediate byte */
 /*  iGAP,*/
 
 /*  iGAP,*/
@@ -163,9 +163,9 @@ enum {
 
   /* Next 64 instructions have 2 immediate bytes */
   iMOVIMA,  /* Move memory at immediate absolute address to A */
-  iMOVAIM,  /* Move A to an absolute immediate address */
+  iMOVIAM,  /* Move A to an absolute immediate address */
   iDVCRIM,  /* Device read from D port to immediate absolute memory address */
-  iCALLIM   /* Decrement Stack Pointer, store address of next instruction at stack then jump at immediate absolute address */
+  iCALLI    /* Store address at [SL SH] and perform jump to immediate absolute byte */
 
   /* TODO Fill this space */
 

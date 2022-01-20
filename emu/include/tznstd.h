@@ -32,6 +32,7 @@
   #endif
 #endif
 
+/* TODO Is it even needed? Previous considerations were made from poor understanding of endianness */
 #ifndef TZN_ISLE /* Is Little Endian */
   #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || \
       defined(__BIG_ENDIAN__) || \
@@ -52,6 +53,11 @@
   #endif
 #endif
 
+/* TODO
+  Side-effect macros might cause problems
+  Better swap them to pure functions
+*/
+
 #define U16_INIT(low, high) (((U16)(high) << 8) | (U16)(low))
 #define U16_LOW(v) ((v) & 0x00FF)
 #define U16_HIGH(v) (((v) & 0xFF00) >> 8)
@@ -61,7 +67,7 @@
 #define U16_HSET(v, byte) do { v = (v & 0x00FF) | ((byte) << 8); } while (0)
 
 /* Subtraction of signed 8 bit integer from 16 unsigned one */
-#define U16_S_I8(sbtrhnd, sbtrctr) \
+#define U16_I8S(sbtrhnd, sbtrctr) \
   if ((sbtrctr) & 0x80) \
     (sbtrhnd) = ((sbtrhnd) - (U8)~(sbtrctr)) - 1; \
   else \
