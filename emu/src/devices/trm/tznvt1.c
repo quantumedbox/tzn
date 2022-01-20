@@ -30,8 +30,8 @@ updCurXY(void)
   fprintf(
     stdout,
     ESC_SEQ "%d;%dH",
-    cur_ypos,
-    cur_xpos
+    cur_ypos + 1,
+    cur_xpos + 1
   );
 }
 
