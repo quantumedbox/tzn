@@ -1,12 +1,6 @@
 #include "tzntrm.h"
 #include "tznstd.h"
 
-static U8 state;
-
-/* Used as temporary for character getting */
-static U8 lookup_x;
-static U8 lookup_y;
-
 /* Implementation dependent functions, compile against something that implements them */
 extern void tznTrmII(void); /* Internal init */
 extern void tznTrmCX(U8 pos); /* Set cursor X pos */
@@ -17,6 +11,12 @@ extern U8 tznTrmGC(U8 x, U8 y); /* Get char */
 
 extern U8 tznTrmSX;
 extern U8 tznTrmSY;
+
+/* Determines command sequence */
+static U8 state;
+/* Used as temporary for character getting */
+static U8 lookup_x;
+static U8 lookup_y;
 
 enum {
   tsNone,

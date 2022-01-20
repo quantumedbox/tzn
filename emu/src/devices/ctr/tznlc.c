@@ -7,7 +7,7 @@
 #include "tzncpu.h"
 #include "tzndvc.h"
 
-extern void tznCpuRs(void); /* Cpu Reset */
+extern void tznCpuRs(void); /* Cpu Reset, defined in tzncpu.c */
 
 void
 tznCtrII(void)

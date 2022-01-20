@@ -192,14 +192,11 @@
 
 
   "kbt"
-    Text keyboard which output corresponds to ascii characters (if possible)
-    If keys do not correspond to ascii character then escape sequence with null string denoting key content is emitted, but only if there's enough space in buffer for it available
-    0 value is reserved for signaling no press available
-    Reading from this device will pop first value from key buffer
-    Writing to this device's port will put values into its buffer at the end as if they were pressed, on overflow nothing will happen
+    Text keyboard which output corresponds to ascii characters
 
-    *It's guaranteed that internal key buffer is at least 256 bytes long
-    *You can't rely on writing escape sequences into the keyboard buffer manually as it could be interrupted by keyboard itself writing at the same time
+    Commands:
+      0x00 -- Reset (Clears buffer)
+      0x10 -- Respond with key non-blockingly, it will return 0x00 if no key is pressed
 
 
   "pms"

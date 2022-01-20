@@ -8,13 +8,20 @@
 
 #include "tznctr.h"
 
+#ifdef TZN_HKBT
+#include "tznkbt.h"
+#endif
+
 /* Ports are dependent on availability of devices, no assumptions should be made about their order */
 enum {
-  dvNone,
+  dvNone
 #ifdef TZN_HTRM
-  dvTerminal,
+  ,dvTrm
 #endif
-  dvController
+  ,dvCtr
+#ifdef TZN_HKBT
+  ,dvKbt
+#endif
 };
 
 /* Initializing is setting devices up in their startup state */
@@ -25,6 +32,9 @@ tznDvcIn(void)
   tznTrmIn();
 #endif
   tznCtrIn();
+#ifdef TZN_HKBT
+  tznKbtIn();
+#endif
 }
 
 TZN_HOT
@@ -34,17 +44,24 @@ tznDvcWr(U8 byte, U8 device)
   switch (device)
   {
 #ifdef TZN_HTRM
-    case dvTerminal:
+    case dvTrm:
     {
       tznTrmWr(byte);
       break;
     }
 #endif
-    case dvController:
+    case dvCtr:
     {
       tznCtrWr(byte);
       break;
     }
+#ifdef TZN_HKBT
+    case dvKbt:
+    {
+      tznKbtWr(byte);
+      break;
+    }
+#endif
     default:
     {
       tznError("invalid device"); /* TEMP */
@@ -59,15 +76,21 @@ tznDvcRd(U8 device)
   switch (device)
   {
 #ifdef TZN_HTRM
-    case dvTerminal:
+    case dvTrm:
     {
       return tznTrmRd();
     }
 #endif
-    case dvController:
+    case dvCtr:
     {
       return tznCtrRd();
     }
+#ifdef TZN_HKBT
+    case dvKbt:
+    {
+      return tznKbtRd();
+    }
+#endif
     default:
     {
       tznError("invalid device"); /* TEMP */

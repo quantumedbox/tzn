@@ -32,27 +32,6 @@
   #endif
 #endif
 
-/* TODO Is it even needed? Previous considerations were made from poor understanding of endianness */
-#ifndef TZN_ISLE /* Is Little Endian */
-  #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || \
-      defined(__BIG_ENDIAN__) || \
-      defined(__ARMEB__) || \
-      defined(__THUMBEB__) || \
-      defined(__AARCH64EB__) || \
-      defined(_MIBSEB) || defined(__MIBSEB) || defined(__MIBSEB__)
-    #define TZN_ISLE 0
-  #elif defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN || \
-      defined(__LITTLE_ENDIAN__) || \
-      defined(__ARMEL__) || \
-      defined(__THUMBEL__) || \
-      defined(__AARCH64EL__) || \
-      defined(_MIPSEL) || defined(__MIPSEL) || defined(__MIPSEL__)
-    #define TZN_ISLE 1
-  #else
-    #error "can't determine endianness of target, set TZN_ISLE macro to 0 or 1 manually"
-  #endif
-#endif
-
 /* TODO
   Side-effect macros might cause problems
   Better swap them to pure functions
@@ -67,7 +46,7 @@
 #define U16_HSET(v, byte) do { v = (v & 0x00FF) | ((byte) << 8); } while (0)
 
 /* Subtraction of signed 8 bit integer from 16 unsigned one */
-#define U16_I8S(sbtrhnd, sbtrctr) \
+#define U16_S_I8(sbtrhnd, sbtrctr) \
   if ((sbtrctr) & 0x80) \
     (sbtrhnd) = ((sbtrhnd) - (U8)~(sbtrctr)) - 1; \
   else \
