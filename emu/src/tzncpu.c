@@ -49,14 +49,15 @@ tznCpuEx(void)
 
   setjmp(restart);
 
-  tznCpuIn(memory);
-  tznDvcIn();
-
+  tznMeSet(memory, TZN_MTOB, 0x00);
   tznMeSet(regs, sizeof(regs[0]) * TZN_REGG, 0x00);
   pgc_r = TZN_MRMS;
   status_r = 0x00;
   regs[rgSL] = U16_LOW(TZN_SPIN);
   regs[rgSH] = U16_HIGH(TZN_SPIN);
+
+  tznCpuIn(memory);
+  tznDvcIn();
 
   while (1)
   {

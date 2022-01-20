@@ -9,17 +9,23 @@
 /* TODO Move to shared TZN code, not EMU specific base */
 
 void
-tznMeSet(void* mem, U16 size, U8 value)
+tznMeSet(void* dest, U16 bytes, U8 value)
 {
-  memset(mem, (size_t)size, value);
+  memset(dest, value, (size_t)bytes);
+}
+
+void
+tznMeCpy(void* dest, void* src, U16 bytes)
+{
+  memcpy(dest, src, (size_t)bytes);
 }
 
 static
 tznBool
 flExists(const char* filename)
 {
-  FILE* fp;
-  if ((fp = fopen(filename, "r")))
+  FILE* fp = fopen(filename, "r");
+  if (fp)
   {
     fclose(fp);
     return TZN_YES;
