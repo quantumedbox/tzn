@@ -64,7 +64,7 @@ tznDvcWr(U8 byte, U8 device)
 #endif
     default:
     {
-      tznError("invalid device"); /* TEMP */
+      tznError("Invalid device"); /* TEMP */
     }
   }
 }
@@ -93,7 +93,7 @@ tznDvcRd(U8 device)
 #endif
     default:
     {
-      tznError("invalid device"); /* TEMP */
+      tznError("Invalid device"); /* TEMP */
     }
   }
 }

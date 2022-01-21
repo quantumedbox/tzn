@@ -37,6 +37,7 @@ static
 void
 defRomIn(U8* memory, U16 size)
 {
+  TZN_ASRT(((TZN_UPTR)memory + size) > (TZN_UPTR)memory, "RAM busted stack");
   TZN_ASRT(size >= sizeof(def_rom), "Cannot fit ROM in RAM");
   tznMeCpy(memory, def_rom, sizeof(def_rom));
 }
@@ -54,6 +55,7 @@ fileIn(U8* memory, U16 size)
 int
 main(int argc, char** argv)
 {
+#ifndef __C64__
   if (argc > 1)
   {
     filename = argv[1];
@@ -61,7 +63,9 @@ main(int argc, char** argv)
   }
   else
     tznCpuMc(defRomIn);
-
+#else
+  tznCpuMc(defRomIn);
+#endif
   tznCpuEx();
   return 0;
 }

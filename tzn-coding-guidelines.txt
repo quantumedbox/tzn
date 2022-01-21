@@ -6,11 +6,18 @@
   Because of that all identifier should have 8 characters at most which leaves 4 to 5 significant chars after "tzn" or "TZN_" prefix
 - Always check nullity of function pointers by "if (ptr)", not with TZN_NULL
 
-- Respect styling:
+- Respecting styling:
   - All variables, macro and function definitions should have comment explaining what their name abbreviates
   - Each indentation level is signaled by 2 spaces
   - Macros identifiers in style of "TZN_MCRO"
+  - TODO Standardize type declarations
   - Functions identifiers in style of "tznMyFun"
   - External variables in style of "tznMyVar"
   - Internal, auto variables, and function arguments in style of "my_var"
   - Enums should not end with comma
+
+- Respecting compilers:
+  - CC65 treats integer constants bigger than 0x7FFF as longs unless you specify they as "U"
+      So use 0xFFFFU instead of 0xFFFF
+  - CC65 is not always smart enough to see that cases with "i++" don't actually use intermediate value
+      So use "++i" as rvalue instead of "i++" unless you need it

@@ -9,6 +9,12 @@
 /* TODO Move to shared TZN code, not EMU specific base */
 
 void
+tznPrint(const char* literal)
+{
+  fputs(literal, stdout);
+}
+
+void
 tznMeSet(void* dest, U16 bytes, U8 value)
 {
   memset(dest, value, (size_t)bytes);
@@ -21,7 +27,7 @@ tznMeCpy(void* dest, void* src, U16 bytes)
 }
 
 static
-tznBool
+TZN_BOOL
 flExists(const char* filename)
 {
   FILE* fp = fopen(filename, "r");
@@ -44,7 +50,7 @@ tznError(const char* literal)
 }
 
 /* TODO Probably a good idea to assert some ferror() checks */
-tznErr
+TZN_ERR
 tznFlRd(const char* filename, U8* memory, U16 size, U16* was_read, U8 flags)
 {
   FILE* fp;
@@ -56,6 +62,7 @@ tznFlRd(const char* filename, U8* memory, U16 size, U16* was_read, U8 flags)
   if (!fp)
     goto ERR;
 
+  #ifndef __CC65__
   if (fseek(fp, 0L, SEEK_END))
     goto ERR_FILE;
 
@@ -64,6 +71,7 @@ tznFlRd(const char* filename, U8* memory, U16 size, U16* was_read, U8 flags)
     goto ERR_FILE;
 
   rewind(fp);
+  #endif
 
   /* By default it is an error to have file that couldn't fit into buffer */
   if (!(flags & TZN_FLIS) && (fp_size > (long int)size))
@@ -73,7 +81,7 @@ tznFlRd(const char* filename, U8* memory, U16 size, U16* was_read, U8 flags)
   if (rdbt != (size_t)fp_size)
     goto ERR_FILE; 
 
-  if (was_read != TZN_NULL)
+  if (was_read)
     *was_read = rdbt;
 
   fclose(fp);
@@ -85,7 +93,7 @@ ERR:
   return 1;
 }
 
-tznErr
+TZN_ERR
 tznFlWr(const char* filename, U8* memory, U16 size, U8 flags)
 {
   FILE* fp;
