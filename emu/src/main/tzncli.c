@@ -37,7 +37,7 @@ static
 void
 defRomIn(U8* memory, U16 size)
 {
-  TZN_ASRT(((TZN_UPTR)memory + size) > (TZN_UPTR)memory, "RAM busted stack");
+  TZN_ASRT(((TZN_UPTR)memory + size) > (TZN_UPTR)memory, "RAM size is incorrect, high address is overflowing");
   TZN_ASRT(size >= sizeof(def_rom), "Cannot fit ROM in RAM");
   tznMeCpy(memory, def_rom, sizeof(def_rom));
 }

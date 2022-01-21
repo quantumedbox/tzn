@@ -20,9 +20,7 @@ static U8 regSH;
 static U8 regF; /* Flag Status Register */
 static U16 regPC; /* 2 Program Counter 8-bit Registers */
 
-static U8 ram[TZN_MTOB]; /* Lowest point of available RAM */
-
-enum { rgA, rgB, rgC, rgD, rgSL, rgSH };
+static U8 ram[TZN_MTOB]; /* RAM mapping */
 
 static
 void
@@ -49,8 +47,6 @@ TZN_NORE
 void
 tznCpuEx(void)
 {
-  tznLog("RAM is reserved...\n");
-
   /* Each sequential initialization of CPU starts from here */
   tznLog("Setting up jump...\n");
   setjmp(restart);
@@ -92,6 +88,10 @@ tznCpuEx(void)
     switch (ram[regPC++])
     {
       /* Register Based Instructions */
+
+      /* TODO We need alternative way of dispatching that would allow for memory savings
+              And in general we need to test how our target compilers are optimizing it if at all
+      */
 
       case iMOV0A:
       {
@@ -227,18 +227,6 @@ tznCpuEx(void)
       }
       case iINCBC:
       {
-        /* TODO
-          Cast [B C] to U16 and use native arithmetic
-          Problem with that is that Big Endian platform will require more than just casting
-          One possibly solution tho is to have [B C] be ordered in ram depending on endianess of target
-
-          For example by:
-            #if TZN_ISLE == 1
-              enum { rgA, rgB, rgC, rgD, rgSL, rgSH };
-            #else
-              enum { rgA, rgC, rgB, rgD, rgL, rgH };
-            #endif
-        */
         if (++regB == U8_MIN)
           regF = ++regC == U8_MIN;
         else
@@ -538,7 +526,7 @@ tznCpuEx(void)
       }
 
       default: {
-        TZN_ASRT(0, "instruction not implemented");
+        TZN_ASRT(0, "Instruction not implemented");
       }
     }
   }

@@ -18,7 +18,7 @@ void tznPrint(const char* literal);
 void tznMeSet(void* dest, U16 bytes, U8 value);
 void tznMeCpy(void* dest, void* src, U16 bytes);
 
-#ifndef TZN_RELEASE
+#ifndef TZN_RLS
   #define tznLog(literal) tznPrint(literal)
 #else
   #define tznLog(literal) (void)0

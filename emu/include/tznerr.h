@@ -9,11 +9,10 @@
 */
 TZN_NORE void tznError(const char* literal);
 
-#define TZN_STRL(x) #x
-#define TZN_STR(x) TZN_STRL(x)
-
-#ifndef TZN_RELEASE
+#ifndef TZN_RLS
   #ifndef __CC65__
+    #define TZN_STRL(x) #x
+    #define TZN_STR(x) TZN_STRL(x)
     #define TZN_ASRT(cond, literal) (cond) ? (void)0 : tznError(__FILE__ ":" TZN_STR(__LINE__) ": \"" literal "\"")
   #else
     /* It appears that CC65 doesn't know how to handle string literal concatenation in this case, so, file and line information is ignored */

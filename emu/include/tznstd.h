@@ -19,14 +19,14 @@
 #endif
 
 #ifdef __GNUC__
-  #ifndef TZN_RELEASE
-    #define TZN_DEAD() TZN_ASRT(0, "reached unreachable")
+  #ifndef TZN_RLS
+    #define TZN_DEAD() TZN_ASRT(0, "Reached unreachable")
   #else
     #define TZN_DEAD() __builtin_unreachable()
   #endif
 #else
-  #ifndef TZN_RELEASE
-    #define TZN_DEAD() TZN_ASRT(0, "reached unreachable")
+  #ifndef TZN_RLS
+    #define TZN_DEAD() TZN_ASRT(0, "Reached unreachable")
   #else
     #define TZN_DEAD() ((void)0) /* TODO Shouldn't be just ignored */
   #endif

@@ -10,7 +10,7 @@ SRC := $(MAIN) $(TRMSRC) $(CTRSRC) $(wildcard $(BASE)/src/*.c)
 
 CCFLAGS := --standard c89 -r --check-stack
 
-RELEASEFLAGS := -Os -Oi -Or -DTZN_RELEASE
+RELEASEFLAGS := -Os -Oi -Or -DTZN_RLS
 DEBUGFLAGS := -g
 
 .PHONY: all clean
