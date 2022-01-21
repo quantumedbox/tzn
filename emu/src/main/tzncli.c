@@ -16,7 +16,7 @@ U8 def_rom[] = {
   iINCBC,
   iJMPRI, -9,
   iMOVID, 0x02,
-  iDVCWI, 0x01,
+  iDVCWI, 0x02,
   'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', 0x00
 };
 

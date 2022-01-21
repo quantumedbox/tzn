@@ -92,7 +92,7 @@ tznTrmPC(U8 ch)
     if (tznTrmSY == (++cur_ypos))
       cur_ypos = 0;
   }
-  updCurXY();
+  updCurXY(); /* TODO It shouldn't need to update positions each time */
 }
 
 U8
