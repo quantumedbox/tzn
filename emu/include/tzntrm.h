@@ -12,8 +12,4 @@
 #define TZN_TRMD 0x20 /* Get Display Size */
 #define TZN_TRMA 0x21 /* Get Char At (X, Y) */
 
-void tznTrmIn(void);
-TZN_HOT void tznTrmWr(U8 byte);
-U8 tznTrmRd(void);
-
 #endif

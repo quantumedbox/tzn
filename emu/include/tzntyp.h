@@ -3,31 +3,27 @@
 
 #include <stddef.h> /* TEMP */
 
-#define TZN_NULL ((void*)0)
+#define T_NULL    ((void*)0)
 
-#define U8      unsigned char
-#define U16     unsigned short
-#define U32     unsigned int
-#define U64     unsigned long long int
+#define T_U8      unsigned char
+#define T_U16     unsigned short
 
-#define I8      signed char
-#define I16     signed short
-#define I32     signed int
-#define I64     signed long long int
+#define T_I8      signed char
+#define T_I16     signed short
 
-#define U8_MIN  ((U8)0)
-#define U8_MAX  ((U8)-1)
+#define T_U8_MIN  ((T_U8)0)
+#define T_U8_MAX  ((T_U8)-1)
 
 /*
   Unsigned integer representation of pointer types
   TODO size_t isn't guaranteed to be able to hold every pointer value
        we need to define it for each implementation in the future
 */
-#define TZN_UPTR  size_t
+#define T_UPTR    size_t
 
-#define TZN_ERR   U8
-#define TZN_BOOL  U8
-#define TZN_YES   ((TZN_BOOL)1)
-#define TZN_NO    ((TZN_BOOL)0)
+#define T_ERR     T_U8
+#define T_BOOL    T_U8
+#define T_TRUE    ((T_BOOL)1)
+#define T_FALSE   ((T_BOOL)0)
 
 #endif

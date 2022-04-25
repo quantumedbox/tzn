@@ -4,9 +4,9 @@
 #include "tznstd.h"
 #include "tznops.h"
 
-typedef void (*CpuMemCB)(U8* memory, U16 size);
+typedef void (*CpuMemCB)(T_U8* memory, T_U16 size);
 
-void TZN_NORE tznCpuEx(void);
+T_NORET void tznCpuEx(void);
 
 /*
   @brief  Register function that should initialize CPU internal memory on startup

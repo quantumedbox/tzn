@@ -8,38 +8,7 @@
 /* TODO Abstract IO operations for portability on various libc implementations (Plan 9 for example) */
 /* TODO Move to shared TZN code, not EMU specific base */
 
-void
-tznPrint(const char* literal)
-{
-  fputs(literal, stdout);
-}
-
-void
-tznMeSet(void* dest, U16 bytes, U8 value)
-{
-  memset(dest, value, (size_t)bytes);
-}
-
-void
-tznMeCpy(void* dest, void* src, U16 bytes)
-{
-  memcpy(dest, src, (size_t)bytes);
-}
-
-static
-TZN_BOOL
-flExists(const char* filename)
-{
-  FILE* fp = fopen(filename, "r");
-  if (fp)
-  {
-    fclose(fp);
-    return TZN_YES;
-  }
-  return TZN_NO;
-}
-
-TZN_NORE
+T_NORET
 void
 tznError(const char* literal)
 {
@@ -49,9 +18,41 @@ tznError(const char* literal)
   exit(EXIT_FAILURE);
 }
 
+void
+tznPrint(const char* literal)
+{
+  fputs(literal, stdout);
+}
+
+void
+tznMeSet(void* dest, T_U16 bytes, T_U8 value)
+{
+  memset(dest, value, (size_t)bytes);
+}
+
+void
+tznMeCpy(void* dest, void* src, T_U16 bytes)
+{
+  memcpy(dest, src, (size_t)bytes);
+}
+
+/* Returns true if file with given name exists, otherwise false */
+static
+T_BOOL
+tFlExst(const char* filename)
+{
+  FILE* fp = fopen(filename, "r");
+  if (fp)
+  {
+    fclose(fp);
+    return T_TRUE;
+  }
+  return T_FALSE;
+}
+
 /* TODO Probably a good idea to assert some ferror() checks */
-TZN_ERR
-tznFlRd(const char* filename, U8* memory, U16 size, U16* was_read, U8 flags)
+T_ERR
+tznFlRd(const char* filename, T_U8* memory, T_U16 size, T_U16* was_read, T_U8 flags)
 {
   FILE* fp;
   long int fp_size;
@@ -77,7 +78,7 @@ tznFlRd(const char* filename, U8* memory, U16 size, U16* was_read, U8 flags)
   if (!(flags & TZN_FLIS) && (fp_size > (long int)size))
     goto ERR_FILE;
 
-  rdbt = fread(memory, sizeof(U8), (size_t)size, fp);
+  rdbt = fread(memory, sizeof(T_U8), (size_t)size, fp);
   if (rdbt != (size_t)fp_size)
     goto ERR_FILE; 
 
@@ -93,20 +94,20 @@ ERR:
   return 1;
 }
 
-TZN_ERR
-tznFlWr(const char* filename, U8* memory, U16 size, U8 flags)
+T_ERR
+tznFlWr(const char* filename, T_U8* memory, T_U16 size, T_U8 flags)
 {
   FILE* fp;
   size_t written;
 
-  if (!(flags & TZN_FLRW) && (flExists(filename)))
+  if (!(flags & TZN_FLRW) && (tFlExst(filename)))
     goto ERR;
 
   fp = fopen(filename, "wb");
   if (!fp)
     goto ERR;
 
-  written = fwrite(memory, sizeof(U8), (size_t)size, fp);
+  written = fwrite(memory, sizeof(T_U8), (size_t)size, fp);
   if (written != (size_t)size)
     goto ERR_FILE;
 

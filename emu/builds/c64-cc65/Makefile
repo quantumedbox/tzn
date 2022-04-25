@@ -1,30 +1,27 @@
 NAME := ROM
 BASE := ../..
-DEF := -DTZN_HTRM
-INC := -I $(BASE)/include/ -I $(BASE)/../include/
+INC := -I $(BASE)/include/ -I $(BASE)/../include/ -I $(BASE)/src/devices/
 
 MAIN := $(BASE)/src/main/tzncli.c
-TRMSRC := $(BASE)/src/devices/tzntrm.c $(BASE)/src/devices/trm/tznc64.c
-CTRSRC := $(BASE)/src/devices/tznctr.c $(BASE)/src/devices/ctr/tznlc.c
-SRC := $(MAIN) $(TRMSRC) $(CTRSRC) $(wildcard $(BASE)/src/*.c)
+SRC := $(MAIN) $(wildcard $(BASE)/src/*.c)
 
-CCFLAGS := --standard c89 -r --check-stack
+CCFLAGS := --standard c89 -Cl -r
 
-RELEASEFLAGS := -Os -Oi -Or -DTZN_RLS
-DEBUGFLAGS := -g
+RELEASEFLAGS := -Os -Oi -Or -DTZN_RLS --asm-args --relax-checks --asm-args -s
+DEBUGFLAGS := -g --check-stack
 
-.PHONY: all clean
+ifdef TZN_RLS
+	CCFLAGS += $(RELEASEFLAGS)
+else
+	CCFLAGS += $(DEBUGFLAGS)
+endif
 
-all: clean debug
+.PHONY: all clean cleanobj
 
-release: CCFLAGS += $(RELEASEFLAGS)
-release: $(NAME)
-
-debug: CCFLAGS += $(DEBUGFLAGS)
-debug: $(NAME)
+all: clean $(NAME)
 
 $(NAME):
-	cl65 -t c64 $(CCFLAGS) $(INC) $(DEF) -o $@ $(SRC)
+	cl65 -t c64 $(CCFLAGS) $(INC) -o $@ $(SRC)
 
 clean: cleanobj
 	$(RM) $(NAME)

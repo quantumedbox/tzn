@@ -1,49 +1,50 @@
 #include "tznstd.h"
+#include "tarch.h"
 #include "tznsys.h"
-#include "tznerr.h"
+#include "tasrt.h"
 
-#ifdef TZN_HTRM
-#include "tzntrm.h"
+#include T_CTR_D
+
+#ifdef T_TRM_D
+#include T_TRM_D
 #endif
 
-#include "tznctr.h"
-
-#ifdef TZN_HKBT
-#include "tznkbt.h"
+#ifdef TZN_KBT_D
+#include TZN_KBT_D
 #endif
 
 /* Ports are dependent on availability of devices, no assumptions should be made about their order */
 enum {
-  dvNone
-#ifdef TZN_HTRM
+   dvCtr
+#ifdef T_TRM_D
   ,dvTrm
 #endif
-  ,dvCtr
 #ifdef TZN_HKBT
   ,dvKbt
 #endif
 };
 
 /* Initializing is setting devices up in their startup state */
+TZN_COLD
 void
 tznDvcIn(void)
 {
-#ifdef TZN_HTRM
-  tznTrmIn();
+#ifdef T_TRM_D
+  tTrmInit();
 #endif
-  tznCtrIn();
+  tCtrInit();
 #ifdef TZN_HKBT
-  tznKbtIn();
+  tKbtInit();
 #endif
 }
 
 TZN_HOT
 void
-tznDvcWr(U8 byte, U8 device)
+tznDvcWr(T_U8 byte, T_U8 device)
 {
   switch (device)
   {
-#ifdef TZN_HTRM
+#ifdef T_TRM_D
     case dvTrm:
     {
       tznTrmWr(byte);
@@ -70,12 +71,12 @@ tznDvcWr(U8 byte, U8 device)
 }
 
 TZN_HOT
-U8
-tznDvcRd(U8 device)
+T_U8
+tznDvcRd(T_U8 device)
 {
   switch (device)
   {
-#ifdef TZN_HTRM
+#ifdef T_TRM_D
     case dvTrm:
     {
       return tznTrmRd();
