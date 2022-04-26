@@ -1,8 +1,10 @@
-#ifndef TZN_OPCODES_H
-#define TZN_OPCODES_H
+#ifndef TOPS_H
+#define TOPS_H
 
 /* TODO Shouldn't be holey, but for now it is */
 /* TODO Do we need bit operators? Feels like shift left right might be quite handy */
+/* TODO Define it with macro constants instead */
+
 enum {
   /* First 64 instuctions are without immediate bytes */
   iMOV0A,

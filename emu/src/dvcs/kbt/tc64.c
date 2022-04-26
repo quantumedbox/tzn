@@ -32,17 +32,19 @@ T_U8 mtxASCII[][] = {
   },
 };
 
+static
 void
 tKbtInIn(void)
 {
   /* Empty */
 }
 
-T_U8
+static
+void
 tznKbtGC(void)
 {
   /* TODO */
-  return mtxASCII[*mkport1][*mkport2];
+  tCpuDvIn = mtxASCII[*mkport1][*mkport2];
 }
 
 #include "dvcs/tkbt.c"

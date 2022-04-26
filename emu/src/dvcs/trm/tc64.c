@@ -3,7 +3,7 @@
 */
 
 #include "tcmplr.h"
-#include "tznsys.h"
+#include "tio.h"
 
 #define T_TRM_WD 40
 #define T_SCR_SZ 1000
@@ -53,12 +53,13 @@ updCurXY(void)
   *tTrmYM = tTrmPosY;
 }
 
+static
 void
 tTrmInIn(void)
 {
   tTrmPosX = 0;
   tTrmPosY = 0;
-  tznMeSet(tTrmScrM, T_SCR_SZ, 0x20);
+  tMemSet(tTrmScrM, 0x20, T_SCR_SZ);
 }
 
 void

@@ -8,6 +8,7 @@ enum {
 static T_U8 tKbtStat;
 
 /* Internal Initialization */
+static
 void
 tKbtInit(void)
 {
@@ -15,8 +16,9 @@ tKbtInit(void)
 }
 
 /* Write */
+static
 void
-tznKbtWr(T_U8 byte)
+tznKbtWr(void)
 {
   switch (byte)
   {
@@ -30,15 +32,13 @@ tznKbtWr(T_U8 byte)
       tKbtStat = tsSKey;
       break;
     }
-    default:
-    {
-      return;
-    }
+    default: (void)0;
   }
 }
 
 /* Read */
-T_U8
+static
+void
 tznKbtRd(void)
 {
   switch (tKbtStat)
@@ -46,11 +46,8 @@ tznKbtRd(void)
     case tsSKey:
     {
       tKbtStat = tsNone;
-      return tznKbtGC();
+      tznKbtGC();
     }
-    default:
-    {
-      return 0x00;
-    }
+    default: (void)0;
   }
 }

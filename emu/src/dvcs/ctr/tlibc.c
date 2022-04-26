@@ -3,12 +3,9 @@
 */
 #include <stdlib.h>
 
-#include "tcmplr.h"
-#include "tzncpu.h"
-#include "tzndvc.h"
+#include "ttzn.h"
 
-extern void tznCpuRs(void); /* Cpu Reset, defined in tzncpu.c */
-
+static
 void
 tCtrInIn(void)
 {
@@ -25,7 +22,7 @@ tznCtrSD(void)
 void
 tznCtrRS(void)
 {
-  tznCpuRs();
+  tCpuRes_();
 }
 
 #include "dvcs/tctr.c"

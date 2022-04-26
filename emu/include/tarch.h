@@ -3,6 +3,7 @@
 
   # Required definitions
     - T_CPU_C -- Specifies CPU source file
+    - T_DVCS_C -- Specifies devices source file
     - T_ARCH -- Holds some value of arch enum that is defined in this file, used for identity
     - T_PG_N -- How many "pages" of memory are available for reading and writing
     - T_CTR_D -- Specifies controller device implementation
@@ -24,10 +25,11 @@ enum {
 #define T_PG_SZ 256U /* Page size in bytes */
 
 #define T_CPU_C "tcpu.c"
+#define T_DVCS_C "tdvcs.c"
 
 #if __CC65__ && __C64__
   #define T_ARCH taC64
-  #define T_PG_N 160U
+  #define T_PG_N 164U
   #define T_CTR_D "dvcs/ctr/tlibc.c"
   #define T_TRM_D "dvcs/trm/tc64.c"
   #define T_KBT_D "dvcs/kbt/tc64.c"

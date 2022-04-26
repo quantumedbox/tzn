@@ -6,6 +6,7 @@
 #include "tcmplr.h"
 
 /* Internal Initialization */
+static
 void
 tCtrInit(void)
 {
@@ -13,10 +14,11 @@ tCtrInit(void)
 }
 
 /* Write */
+static
 void
-tznCtrWr(T_U8 byte)
+tznCtrWr(void)
 {
-  switch (byte)
+  switch (tCpuDvIn)
   {
     case TZN_CTRS:
     {
@@ -26,16 +28,14 @@ tznCtrWr(T_U8 byte)
     {
       tznCtrRS();
     }
-    default:
-    {
-      return;
-    }
+    default: (void)0;
   }
 }
 
 /* Read */
-T_U8
+static
+void
 tznCtrRd(void)
 {
-  return 0;
+  tCpuDvIn = 0;
 }

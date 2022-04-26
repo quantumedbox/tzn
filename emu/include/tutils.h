@@ -22,6 +22,6 @@
     (sbtrhnd) += (sbtrctr);
 
 #define T_STREX_(x) #x
-#define T_STREXP(x) T_STR_(x)
+#define T_STREXP(x) T_STREX_(x)
 
 #endif

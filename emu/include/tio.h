@@ -1,11 +1,14 @@
 /*
-  System communication abstraction
+  IO interface
 
   TODO Abstract all of libc in here
 */
 
-#ifndef TZN_SYSH
-#define TZN_SYSH
+#ifndef TSYS_H
+#define TSYS_H
+
+#include <stdio.h>
+#include <string.h>
 
 #include "tcmplr.h"
 
@@ -14,7 +17,9 @@
 #define TZN_FLIS 0x01 /* Ignore size */
 #define TZN_FLRW 0x02 /* Rewrite */
 
-void tznPrint(const char* literal);
+/* TODO Do they make sense be here? */
+#define tMemSet(dest, val, bytes)   memset(dest, val, (size_t)bytes)
+#define tMemCopy(dest, src, bytes)  memcpy(dest, src, (size_t)bytes)
 
 /*
   @brief  Print null terminated string holding error message and then exit
@@ -22,13 +27,12 @@ void tznPrint(const char* literal);
 */
 T_NORET void tznError(const char* literal);
 
-void tznMeSet(void* dest, T_U16 bytes, T_U8 value);
-void tznMeCpy(void* dest, void* src, T_U16 bytes);
+#define tPrint(literal) fputs(literal, stdout)
 
 #ifndef TZN_RLS
-  #define tznLog(literal) tznPrint(literal)
+  #define tznLog(literal) tPrint(literal)
 #else
-  #define tznLog(literal) (void)0
+  #define tznLog(literal) (void)(0)
 #endif
 
 #ifdef T_FLSYS

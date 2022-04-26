@@ -1,7 +1,5 @@
-#include "tarch.h"
-#include "tzncpu.h"
-#include "tcmplr.h"
-#include "tznsys.h"
+#include "ttzn.h"
+#include "tio.h"
 #include "tasrt.h"
 
 /* TODO: Implement mechanism for embedding custom ROMs */
@@ -43,7 +41,7 @@ T_U8 test_rom[] = {
     TZN_ASRT(((T_UPTR)(mem) + (sz)) > (T_UPTR)(mem), "RAM sz is incorrect, high address is overflowing"); \
     if (!filename) { \
       TZN_ASRT((sz) >= sizeof(def_rom), "Cannot fit ROM in RAM"); \
-      tznMeCpy((mem), def_rom, sizeof(def_rom)); \
+      tMemCopy((mem), def_rom, sizeof(def_rom)); \
     } else if (tznFlRd(filename, (mem), (sz), T_NULL, TZN_FL0)) \
       tznError("Error while reading ROM"); \
     }
@@ -51,7 +49,7 @@ T_U8 test_rom[] = {
   #define T_ROM_IN(mem, sz) { \
     TZN_ASRT(((T_UPTR)(mem) + (sz)) > (T_UPTR)(mem), "RAM sz is incorrect, high address is overflowing"); \
     TZN_ASRT((sz) >= sizeof(def_rom), "Cannot fit ROM in RAM"); \
-    tznMeCpy((mem), def_rom, sizeof(def_rom)); \
+    tMemCopy((mem), def_rom, sizeof(def_rom)); \
   }
 #endif
 

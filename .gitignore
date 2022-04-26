@@ -2,6 +2,7 @@
 **/*.sublime-workspace
 **/*.o
 **/*.d
+**/*.s
 **/build/
 **/*.temp
 **/ROM

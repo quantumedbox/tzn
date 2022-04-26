@@ -21,6 +21,7 @@ enum {
   tsSCh     /* Send Char */
 };
 
+static
 void
 tTrmInit(void)
 {
@@ -28,11 +29,11 @@ tTrmInit(void)
   tTrmInIn();
 }
 
-T_HOT
+static
 void
-tznTrmWr(T_U8 byte)
+tznTrmWr(void)
 {
-  if (byte == TZN_TRMR) {
+  if (tCpuDvIn == TZN_TRMR) {
     tTrmStat = tsNone;
     return;
   }
@@ -42,7 +43,7 @@ tznTrmWr(T_U8 byte)
     /* Expecting to start new command sequence */
     case tsNone:
     {
-      switch (byte)
+      switch (tCpuDvIn)
       {
         case TZN_TRMX:
         {
@@ -86,7 +87,7 @@ tznTrmWr(T_U8 byte)
     /* Set cursor horizontal pos */
     case tsWSCurX:
     {
-      tznTrmCX(byte);
+      tznTrmCX(tCpuDvIn);
       tTrmStat = tsNone;
       break;
     }
@@ -94,7 +95,7 @@ tznTrmWr(T_U8 byte)
     /* Set cursor vertical pos */
     case tsWSCurY:
     {
-      tznTrmCY(byte);
+      tznTrmCY(tCpuDvIn);
       tTrmStat = tsNone;
       break;
     }
@@ -102,7 +103,7 @@ tznTrmWr(T_U8 byte)
     /* Print character at cursor position, move cursor forward */
     case tsWSCurV:
     {
-      tznTrmCV(byte);
+      tznTrmCV(tCpuDvIn);
       tTrmStat = tsNone;
       break;
     }
@@ -110,7 +111,7 @@ tznTrmWr(T_U8 byte)
     /* Print character at cursor position, move cursor forward */
     case tsWPutCh:
     {
-      tznTrmPC(byte);
+      tznTrmPC(tCpuDvIn);
       tTrmStat = tsNone;
       break;
     }
@@ -118,14 +119,14 @@ tznTrmWr(T_U8 byte)
     /* Print character at cursor position, move cursor forward, wait next character of 0x00 to stop */
     case tsWPutSt: /* Wair Put String */
     {
-      tznTrmPC(byte);
+      tznTrmPC(tCpuDvIn);
       break;
     }
 
     /* Set temporary for x position, await to send y position */
     case tsWChX:  /* Get Char Wait X */
     {
-      tTrmLkX = byte;
+      tTrmLkX = tCpuDvIn;
       tTrmStat = tsWChY;
       break;
     }
@@ -133,14 +134,14 @@ tznTrmWr(T_U8 byte)
     /* Set temporary for y position, await reading of char */
     case tsWChY:
     {
-      tTrmLkY = byte;
+      tTrmLkY = tCpuDvIn;
       tTrmStat = tsSCh; /* */;
       break;
     }
   }
 }
 
-T_U8
+void
 tznTrmRd(void)
 {
   switch (tTrmStat) {
@@ -149,28 +150,23 @@ tznTrmRd(void)
     case tsSDisSX: /* Send Display Size X */
     {
       tTrmStat = tsSDisSY;
-      return tTrmSzX;
+      tCpuDvIn = tTrmSzX;
     }
 
     /* Send display height, end command sequence */
     case tsSDisSY:
     {
       tTrmStat = tsNone;
-      return tTrmSzY;
+      tCpuDvIn = tTrmSzY;
     }
 
     /* Send character at previously specified position, end command sequence */
     case tsSCh    /* */:
     {
       tTrmStat = tsNone;
-      return tznTrmGC(tTrmLkX, tTrmLkY);
+      tCpuDvIn = tznTrmGC(tTrmLkX, tTrmLkY);
     }
 
-    /*
-      If terminal doesn't expect reading it returns zero byte
-      TODO But at the same time nothing says it should? Maybe we could specify that 0x00 is expected to be read
-    */
-    default:
-      return 0x00;
+    default: (void)0;
   }
 }

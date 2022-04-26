@@ -1,39 +1,22 @@
+#include "tio.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "tznsys.h"
-#include "tcmplr.h"
+#include "ttzn.h"
 
 /* TODO Abstract IO operations for portability on various libc implementations (Plan 9 for example) */
 /* TODO Move to shared TZN code, not EMU specific base */
+/* TODO Use <fcntl.h> instead, it provides simpler functions */
 
 T_NORET
 void
 tznError(const char* literal)
 {
-  fputs("[error: ", stderr);
+  fputs("error: ", stderr);
   fputs(literal, stderr);
-  fputc(']', stderr);
   exit(EXIT_FAILURE);
-}
-
-void
-tznPrint(const char* literal)
-{
-  fputs(literal, stdout);
-}
-
-void
-tznMeSet(void* dest, T_U16 bytes, T_U8 value)
-{
-  memset(dest, value, (size_t)bytes);
-}
-
-void
-tznMeCpy(void* dest, void* src, T_U16 bytes)
-{
-  memcpy(dest, src, (size_t)bytes);
 }
 
 /* Returns true if file with given name exists, otherwise false */

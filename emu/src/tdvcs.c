@@ -1,6 +1,6 @@
 #include "tcmplr.h"
 #include "tarch.h"
-#include "tznsys.h"
+#include "tio.h"
 #include "tasrt.h"
 
 #include T_CTR_D
@@ -25,41 +25,41 @@ enum {
 };
 
 /* Initializing is setting devices up in their startup state */
-T_COLD
+static
 void
 tznDvcIn(void)
 {
+  tCtrInit();
 #ifdef T_TRM_D
   tTrmInit();
 #endif
-  tCtrInit();
 #ifdef TZN_HKBT
   tKbtInit();
 #endif
 }
 
-T_HOT
+static
 void
-tznDvcWr(T_U8 byte, T_U8 device)
+tznDvcWr(void)
 {
-  switch (device)
+  switch (tCpuRgD)
   {
+    case dvCtr:
+    {
+      tznCtrWr();
+      break;
+    }
 #ifdef T_TRM_D
     case dvTrm:
     {
-      tznTrmWr(byte);
+      tznTrmWr();
       break;
     }
 #endif
-    case dvCtr:
-    {
-      tznCtrWr(byte);
-      break;
-    }
 #ifdef TZN_HKBT
     case dvKbt:
     {
-      tznKbtWr(byte);
+      tznKbtWr();
       break;
     }
 #endif
@@ -70,26 +70,26 @@ tznDvcWr(T_U8 byte, T_U8 device)
   }
 }
 
-T_HOT
-T_U8
-tznDvcRd(T_U8 device)
+static
+void
+tznDvcRd(void)
 {
-  switch (device)
+  switch (tCpuRgD)
   {
+    case dvCtr:
+    {
+      tznCtrRd();
+    }
 #ifdef T_TRM_D
     case dvTrm:
     {
-      return tznTrmRd();
+      tznTrmRd();
     }
 #endif
-    case dvCtr:
-    {
-      return tznCtrRd();
-    }
 #ifdef TZN_HKBT
     case dvKbt:
     {
-      return tznKbtRd();
+      tznKbtRd();
     }
 #endif
     default:

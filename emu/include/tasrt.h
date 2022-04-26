@@ -11,7 +11,7 @@
     #define TZN_ASRT(cond, literal) (cond) ? (void)0 : tznError(literal)
   #endif
 #else
-  #define TZN_ASRT(cond, literal) ((void)(cond))
+  #define TZN_ASRT(cond, literal) (void)(0)
 #endif
 
 #endif

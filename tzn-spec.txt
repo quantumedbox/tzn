@@ -140,7 +140,7 @@
   TO-CONSIDER
     -- Native way of looping with specifying the predicate instruction
     -- Device interrupts for escaping the loops in device driven logic
-       For example, while writing string you might not need to compare with 0x00 in the program and expect that device itself will tell when to stop 
+       For example, while writing string you might not need to compare with 0x00 in the program and expect that device itself will tell when to stop
 
 
 -- Device Overview --

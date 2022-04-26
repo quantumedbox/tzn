@@ -1,24 +1,27 @@
-NAME := ROM
+NAME := tznemu
 BASE := ../..
 INC := -I $(BASE)/include/ -I $(BASE)/../include/ -I $(BASE)/src/
 
 MAIN := $(BASE)/src/main/tzncli.c
-SRC := $(MAIN) $(BASE)/src/tzndvc.c $(BASE)/src/tznsys.c
+SRC := $(MAIN) $(BASE)/src/tio.c
 
 CCFLAGS := --standard c89 -Cl -r
 
-RELEASEFLAGS := -Os -Oi -Or -DTZN_RLS --asm-args --relax-checks --asm-args -s
+RELEASEFLAGS := -Osir -DTZN_RLS --asm-args --relax-checks --asm-args -s
 DEBUGFLAGS := -g --check-stack
 
-ifdef TZN_RLS
-	CCFLAGS += $(RELEASEFLAGS)
-else
-	CCFLAGS += $(DEBUGFLAGS)
-endif
+# ifndef TZN_RLS
+# 	CCFLAGS += $(DEBUGFLAGS)
+# else
+CCFLAGS += $(RELEASEFLAGS)
+# endif
 
 .PHONY: all clean cleanobj
 
 all: clean $(NAME)
+
+asm:
+	cl65 -t c64 -S $(CCFLAGS) $(INC) $(SRC)
 
 $(NAME):
 	cl65 -t c64 $(CCFLAGS) $(INC) -o $@ $(SRC)
