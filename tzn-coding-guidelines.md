@@ -33,8 +33,9 @@
   - As device implementations are exception to conventional way of structuring C projects, global variables, functions and statics should be prefixed with device to which they belong, for example with `tTrmSize` 
 
 # Respecting compilers
-  - CC65 treats integer constants bigger than `0x7FFF` as longs unless you specify they as `U`, so always use `0xFFFFU` instead of `0xFFFF`
+  - CC65 treats integer constants bigger than `0x7FFF` as longs unless you specify they as `U`, so always use `0xFFFFU` instead of `0xFFFF`. Result of literal operation is treated as longs too, so, better make every value maked as usigned
   - CC65 is not always smart enough to see that cases with `i++` don't actually use intermediate value, so use `++i` as rvalue instead of `i++` unless you need it
+  - CC65 doesn't have much of inline optimization, you need to manually inline functions if you need it, possibly with macro functions
   - We can't rely on LTO as legacy compilers do not provide this, so, critical code should be included in other sources as much as possible
 
 # Respecting hardware

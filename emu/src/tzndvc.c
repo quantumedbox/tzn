@@ -1,4 +1,4 @@
-#include "tznstd.h"
+#include "tcmplr.h"
 #include "tarch.h"
 #include "tznsys.h"
 #include "tasrt.h"
@@ -25,7 +25,7 @@ enum {
 };
 
 /* Initializing is setting devices up in their startup state */
-TZN_COLD
+T_COLD
 void
 tznDvcIn(void)
 {
@@ -38,7 +38,7 @@ tznDvcIn(void)
 #endif
 }
 
-TZN_HOT
+T_HOT
 void
 tznDvcWr(T_U8 byte, T_U8 device)
 {
@@ -70,7 +70,7 @@ tznDvcWr(T_U8 byte, T_U8 device)
   }
 }
 
-TZN_HOT
+T_HOT
 T_U8
 tznDvcRd(T_U8 device)
 {

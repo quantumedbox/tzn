@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#include "tznstd.h"
+#include "tcmplr.h"
 
 #define T_TRM_WD 80 /* Screen width */
 #define T_TRM_HG 25 /* Screen height */
@@ -22,7 +22,7 @@ static T_U8 tTrmPosY;
 
 static T_U8 tTrmScr[T_TRM_WD * T_TRM_HG];
 
-TZN_HOT
+T_HOT
 static
 void
 updCurXY(void)
@@ -79,7 +79,7 @@ tznTrmCV(T_U8 state)
     fputs(T_HIDE_CUR, stdout);
 }
 
-TZN_HOT
+T_HOT
 void
 tznTrmPC(T_U8 ch)
 {
@@ -102,4 +102,4 @@ tznTrmGC(T_U8 x, T_U8 y)
   return tTrmScr[x + y * tTrmSzX];
 }
 
-#include "ttrm.c" /* General device impl */
+#include "dvcs/ttrm.c" /* General device impl */

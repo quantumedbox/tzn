@@ -1,5 +1,5 @@
 #include "tzntrm.h"
-#include "tznstd.h"
+#include "tcmplr.h"
 
 /* Determines command sequence */
 static T_U8 tTrmStat;
@@ -28,7 +28,7 @@ tTrmInit(void)
   tTrmInIn();
 }
 
-TZN_HOT
+T_HOT
 void
 tznTrmWr(T_U8 byte)
 {

@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "tznsys.h"
-#include "tznstd.h"
+#include "tcmplr.h"
 
 /* TODO Abstract IO operations for portability on various libc implementations (Plan 9 for example) */
 /* TODO Move to shared TZN code, not EMU specific base */

@@ -1,9 +1,9 @@
 NAME := ROM
 BASE := ../..
-INC := -I $(BASE)/include/ -I $(BASE)/../include/ -I $(BASE)/src/devices/
+INC := -I $(BASE)/include/ -I $(BASE)/../include/ -I $(BASE)/src/
 
 MAIN := $(BASE)/src/main/tzncli.c
-SRC := $(MAIN) $(wildcard $(BASE)/src/*.c)
+SRC := $(MAIN) $(BASE)/src/tzndvc.c $(BASE)/src/tznsys.c
 
 CCFLAGS := --standard c89 -Cl -r
 

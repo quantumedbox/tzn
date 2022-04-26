@@ -3,7 +3,7 @@
 */
 #include <stdlib.h>
 
-#include "tznstd.h"
+#include "tcmplr.h"
 #include "tzncpu.h"
 #include "tzndvc.h"
 
@@ -28,4 +28,4 @@ tznCtrRS(void)
   tznCpuRs();
 }
 
-#include "tctr.c"
+#include "dvcs/tctr.c"

@@ -1,16 +1,23 @@
+/*
+  CPU emulation implementation
+
+  Requires `tRomInit` to be implemented in the same translation unit as a macro
+  ```c
+  #define T_ROM_IN(mem, sz)
+  ```
+*/
+
 #include "tzncpu.h"
 
 #include <stdio.h>
 #include <setjmp.h>
 
-#include "tarch.h"
-#include "tznstd.h"
+#include "ttzn.h"
 #include "tznsys.h"
 #include "tzndvc.h"
 #include "tasrt.h"
 
 static jmp_buf restart;
-static CpuMemCB memincb; /* Memory Init Callback */
 
 /* Registers */
 static T_U8 regA;
@@ -24,26 +31,11 @@ static T_U16 regPC; /* 2 Program Counter 8-bit Registers */ /* TODO: Investigate
 
 static T_U8 ram[T_PG_N * T_PG_SZ]; /* RAM mapping */
 
-static
-void
-tznCpuIn(T_U8* memory)
-{
-  TZN_ASRT(memincb, "NULL in memory init callback");
-  memincb(memory, T_PG_N * T_PG_SZ);
-}
-
 /* Used for providing ability to restart the execution */
 void
 tznCpuRs(void)
 {
   longjmp(restart, 0);
-}
-
-void
-tznCpuMc(CpuMemCB callback)
-{
-  TZN_ASRT(callback, "NULL passed in tznCpuMc()");
-  memincb = callback;
 }
 
 T_NORET
@@ -68,7 +60,8 @@ tznCpuEx(void)
   regPC = 0x00;
 
   tznLog("Initializing cpu state...\n");
-  tznCpuIn(ram);
+  T_ROM_IN(ram, T_PG_N * T_PG_SZ);
+
   tznLog("Initializing devices...\n");
   tznDvcIn();
 

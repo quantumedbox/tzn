@@ -4,7 +4,7 @@
 
 #include <conio.h>
 
-#include "tznstd.h"
+#include "tcmplr.h"
 
 void
 tKbtInIn(void)
@@ -21,4 +21,4 @@ tznKbtGC(void)
     return 0x00;
 }
 
-#include "tkbt.c"
+#include "dvcs/tkbt.c"

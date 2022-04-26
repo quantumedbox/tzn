@@ -3,7 +3,7 @@
 */
 
 #include "tznctr.h"
-#include "tznstd.h"
+#include "tcmplr.h"
 
 /* Internal Initialization */
 void

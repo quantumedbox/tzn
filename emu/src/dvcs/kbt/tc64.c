@@ -2,7 +2,7 @@
   Commodore 64 keyboard interface
 */
 
-#include "tznstd.h"
+#include "tcmplr.h"
 
 static T_U16* mkport1 = (T_U16*)(void*)0xDC00;
 static T_U16* mkport2 = (T_U16*)(void*)0xDC01;
@@ -44,3 +44,5 @@ tznKbtGC(void)
   /* TODO */
   return mtxASCII[*mkport1][*mkport2];
 }
+
+#include "dvcs/tkbt.c"

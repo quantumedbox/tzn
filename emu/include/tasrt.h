@@ -1,7 +1,7 @@
 #ifndef T_ERRH
 #define T_ERRH
 
-#include "tznstd.h"
+#include "tcmplr.h"
 
 #ifndef TZN_RLS
   #ifndef __CC65__

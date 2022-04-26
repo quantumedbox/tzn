@@ -1,7 +1,7 @@
 #ifndef TZN_TRMH
 #define TZN_TRMH
 
-#include "tznstd.h"
+#include "tcmplr.h"
 
 #define TZN_TRMR 0x00 /* Reset */
 #define TZN_TRMX 0x10 /* Set Cursor X */

@@ -7,7 +7,7 @@
 #ifndef TZN_SYSH
 #define TZN_SYSH
 
-#include "tznstd.h"
+#include "tcmplr.h"
 
 /* File operation modes */
 #define TZN_FL0  0x00 /* Default */

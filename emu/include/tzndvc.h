@@ -1,12 +1,12 @@
 #ifndef TZN_DVCH
 #define TZN_DVCH
 
-#include "tznstd.h"
+#include "tcmplr.h"
 
-TZN_COLD void tznDvcIn(void);
+T_COLD void tznDvcIn(void);
 
-TZN_HOT void tznDvcWr(T_U8 byte, T_U8 device);
+T_HOT void tznDvcWr(T_U8 byte, T_U8 device);
 
-TZN_HOT T_U8 tznDvcRd(T_U8 device);
+T_HOT T_U8 tznDvcRd(T_U8 device);
 
 #endif
