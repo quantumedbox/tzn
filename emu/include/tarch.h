@@ -29,7 +29,7 @@ enum {
 
 #if __CC65__ && __C64__
   #define T_ARCH taC64
-  #define T_PG_N 172U
+  #define T_PG_N 174U
   #define T_CTR_D "dvcs/ctr/tlibc.c"
   #define T_TRM_D "dvcs/trm/tc64.c"
   #define T_KBT_D "dvcs/kbt/tc64.c"

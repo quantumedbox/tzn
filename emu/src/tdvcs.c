@@ -65,7 +65,7 @@ tznDvcWr(void)
 #endif
     default:
     {
-      tError("invalid device"); /* TEMP */
+      tError("invalid device"); /* TODO Should be undefined behavior instead? */
     }
   }
 }
@@ -94,7 +94,7 @@ tznDvcRd(void)
 #endif
     default:
     {
-      tError("invalid device"); /* TEMP */
+      tError("invalid device"); /* TODO Should be undefined behavior instead? */
     }
   }
 }

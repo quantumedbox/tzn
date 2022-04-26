@@ -5,7 +5,7 @@
 /* TODO: Implement mechanism for embedding custom ROMs */
 
 T_U8 def_rom[] = {
-  iMOVID, 0x06,
+  iMOVID, 0x01,
   iMOVIB, 0x13,
   iDVCWI, 0x14,
   iDVCWM,
@@ -46,6 +46,7 @@ T_U8 def_rom[] = {
       tError("Error while reading ROM"); \
     }
 #else
+
   #define T_ROM_IN(mem, sz) { \
     TZN_ASRT(((T_UPTR)(mem) + (sz)) > (T_UPTR)(mem), "RAM sz is incorrect, high address is overflowing"); \
     TZN_ASRT((sz) >= sizeof(def_rom), "Cannot fit ROM in RAM"); \
@@ -55,18 +56,22 @@ T_U8 def_rom[] = {
 
 #include T_CPU_C
 
-int
-main(int argc, char** argv)
-{
 #ifdef T_FLSYS
-  /* On OS hosted runtime we could receive filename as terminal argument for what ROM should be initialized on startup */
-  if (argc > 1)
-    filename = argv[1];
+  int
+  main(int argc, char** argv)
+  {
+    if (argc > 1)
+      filename = argv[1];
+
+    tznCpuEx();
+    return 0;
+  }
+
 #else
-  /* Otherwise internal rom is assumed */
-  (void)argc;
-  (void)argv;
+  int
+  main()
+  {
+    tznCpuEx();
+    return 0;
+  }
 #endif
-  tznCpuEx();
-  return 0;
-}
