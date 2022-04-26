@@ -53,15 +53,6 @@ updCurXY(void)
   *tTrmYM = tTrmPosY;
 }
 
-static
-void
-tTrmInIn(void)
-{
-  tTrmPosX = 0;
-  tTrmPosY = 0;
-  tMemSet(tTrmScrM, 0x20, T_SCR_SZ);
-}
-
 void
 tznTrmCX(T_U8 pos)
 {
@@ -110,3 +101,13 @@ tznTrmGC(T_U8 x, T_U8 y)
 }
 
 #include "dvcs/ttrm.c" /* General device impl */
+
+static
+void
+tTrmInit(void)
+{
+  tTrmStat = tsNone;
+  tTrmPosX = 0;
+  tTrmPosY = 0;
+  tMemSet(tTrmScrM, 0x20, T_SCR_SZ);
+}

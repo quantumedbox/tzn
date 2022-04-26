@@ -5,13 +5,6 @@
 
 #include "ttzn.h"
 
-static
-void
-tCtrInIn(void)
-{
-  /* Empty */
-}
-
 T_NORET
 void
 tznCtrSD(void)
@@ -26,3 +19,10 @@ tznCtrRS(void)
 }
 
 #include "dvcs/tctr.c"
+
+static
+void
+tCtrInit(void)
+{
+  /* Empty */
+}

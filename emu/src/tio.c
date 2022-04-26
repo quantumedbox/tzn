@@ -10,15 +10,6 @@
 /* TODO Move to shared TZN code, not EMU specific base */
 /* TODO Use <fcntl.h> instead, it provides simpler functions */
 
-T_NORET
-void
-tznError(const char* literal)
-{
-  fputs("error: ", stderr);
-  fputs(literal, stderr);
-  exit(EXIT_FAILURE);
-}
-
 /* Returns true if file with given name exists, otherwise false */
 static
 T_BOOL

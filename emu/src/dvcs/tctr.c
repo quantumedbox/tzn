@@ -5,14 +5,6 @@
 #include "tznctr.h"
 #include "tcmplr.h"
 
-/* Internal Initialization */
-static
-void
-tCtrInit(void)
-{
-  tCtrInIn();
-}
-
 /* Write */
 static
 void

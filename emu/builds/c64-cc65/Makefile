@@ -3,7 +3,6 @@ BASE := ../..
 INC := -I $(BASE)/include/ -I $(BASE)/../include/ -I $(BASE)/src/
 
 MAIN := $(BASE)/src/main/tzncli.c
-SRC := $(MAIN) $(BASE)/src/tio.c
 
 CCFLAGS := --standard c89 -Cl -r
 
@@ -21,10 +20,10 @@ CCFLAGS += $(RELEASEFLAGS)
 all: clean $(NAME)
 
 asm:
-	cl65 -t c64 -S $(CCFLAGS) $(INC) $(SRC)
+	cl65 -t c64 -S $(CCFLAGS) $(INC) $(MAIN)
 
 $(NAME):
-	cl65 -t c64 $(CCFLAGS) $(INC) -o $@ $(SRC)
+	cl65 -t c64 $(CCFLAGS) $(INC) -o $@ $(MAIN)
 
 clean: cleanobj
 	$(RM) $(NAME)

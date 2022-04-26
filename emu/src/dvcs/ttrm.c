@@ -23,14 +23,6 @@ enum {
 
 static
 void
-tTrmInit(void)
-{
-  tTrmStat = tsNone;
-  tTrmInIn();
-}
-
-static
-void
 tznTrmWr(void)
 {
   if (tCpuDvIn == TZN_TRMR) {
@@ -67,7 +59,7 @@ tznTrmWr(void)
         }
         case TZN_TRMS:
         {
-          tTrmStat = tsWPutSt; /* Wair Put String */
+          tTrmStat = tsWPutSt; /* Wait Put String */
           break;
         }
         case TZN_TRMD:
@@ -161,12 +153,21 @@ tznTrmRd(void)
     }
 
     /* Send character at previously specified position, end command sequence */
-    case tsSCh    /* */:
+    case tsSCh:
     {
       tTrmStat = tsNone;
       tCpuDvIn = tznTrmGC(tTrmLkX, tTrmLkY);
     }
 
     default: (void)0;
+  }
+}
+
+void
+tTrmPrLt(const char* literal)
+{
+  while (*literal) {
+    tznTrmPC(*literal);
+    ++literal;
   }
 }

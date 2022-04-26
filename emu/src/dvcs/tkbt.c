@@ -7,14 +7,6 @@ enum {
 
 static T_U8 tKbtStat;
 
-/* Internal Initialization */
-static
-void
-tKbtInit(void)
-{
-  tKbtInIn();
-}
-
 /* Write */
 static
 void

@@ -34,13 +34,6 @@ T_U8 mtxASCII[][] = {
 
 static
 void
-tKbtInIn(void)
-{
-  /* Empty */
-}
-
-static
-void
 tznKbtGC(void)
 {
   /* TODO */
@@ -48,3 +41,10 @@ tznKbtGC(void)
 }
 
 #include "dvcs/tkbt.c"
+
+static
+void
+tKbtInit(void)
+{
+  /* Empty */
+}

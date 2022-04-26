@@ -65,7 +65,7 @@ tznDvcWr(void)
 #endif
     default:
     {
-      tznError("Invalid device"); /* TEMP */
+      tError("invalid device"); /* TEMP */
     }
   }
 }
@@ -94,7 +94,7 @@ tznDvcRd(void)
 #endif
     default:
     {
-      tznError("Invalid device"); /* TEMP */
+      tError("invalid device"); /* TEMP */
     }
   }
 }

@@ -2,12 +2,13 @@
   IO interface
 
   TODO Abstract all of libc in here
+  TODO Usage of libc implementation of CC65 makes for duplication of some code
+       For example, puts essentially doubles the same code that is already present in trm device
 */
 
 #ifndef TSYS_H
 #define TSYS_H
 
-#include <stdio.h>
 #include <string.h>
 
 #include "tcmplr.h"
@@ -21,13 +22,19 @@
 #define tMemSet(dest, val, bytes)   memset(dest, val, (size_t)bytes)
 #define tMemCopy(dest, src, bytes)  memcpy(dest, src, (size_t)bytes)
 
+void tTrmPrLt(const char* literal); /* Use terminal device implementation for printing */
+
 /*
   @brief  Print null terminated string holding error message and then exit
   @warn   Preferably only const literals should be passed here, don't mess with null strings
 */
-T_NORET void tznError(const char* literal);
+#define tError(literal) do { \
+  tTrmPrLt("error: "); \
+  tTrmPrLt(literal); \
+  exit(EXIT_FAILURE); \
+} while (0)
 
-#define tPrint(literal) fputs(literal, stdout)
+#define tPrint(literal) tTrmPrLt(literal)
 
 #ifndef TZN_RLS
   #define tznLog(literal) tPrint(literal)

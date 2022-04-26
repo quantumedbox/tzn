@@ -5,7 +5,7 @@
 /* TODO: Implement mechanism for embedding custom ROMs */
 
 T_U8 def_rom[] = {
-  iMOVID, 0x01,
+  iMOVID, 0x06,
   iMOVIB, 0x13,
   iDVCWI, 0x14,
   iDVCWM,
@@ -20,7 +20,7 @@ T_U8 def_rom[] = {
 };
 
 /*
-T_U8 test_rom[] = {
+T_U8 def_rom[] = {
   iMOVID, 0x01,
   iDVCWI, 0x10,
   iDVCRA,
@@ -43,7 +43,7 @@ T_U8 test_rom[] = {
       TZN_ASRT((sz) >= sizeof(def_rom), "Cannot fit ROM in RAM"); \
       tMemCopy((mem), def_rom, sizeof(def_rom)); \
     } else if (tznFlRd(filename, (mem), (sz), T_NULL, TZN_FL0)) \
-      tznError("Error while reading ROM"); \
+      tError("Error while reading ROM"); \
     }
 #else
   #define T_ROM_IN(mem, sz) { \
