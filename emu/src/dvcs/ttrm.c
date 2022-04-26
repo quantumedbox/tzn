@@ -143,6 +143,7 @@ tznTrmRd(void)
     {
       tTrmStat = tsSDisSY;
       tCpuDvIn = tTrmSzX;
+      break;
     }
 
     /* Send display height, end command sequence */
@@ -150,6 +151,7 @@ tznTrmRd(void)
     {
       tTrmStat = tsNone;
       tCpuDvIn = tTrmSzY;
+      break;
     }
 
     /* Send character at previously specified position, end command sequence */
@@ -157,6 +159,7 @@ tznTrmRd(void)
     {
       tTrmStat = tsNone;
       tCpuDvIn = tznTrmGC(tTrmLkX, tTrmLkY);
+      break;
     }
 
     default: (void)0;

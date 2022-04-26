@@ -79,17 +79,20 @@ tznDvcRd(void)
     case dvCtr:
     {
       tznCtrRd();
+      break;
     }
 #ifdef T_TRM_D
     case dvTrm:
     {
       tznTrmRd();
+      break;
     }
 #endif
 #ifdef TZN_HKBT
     case dvKbt:
     {
       tznKbtRd();
+      break;
     }
 #endif
     default:

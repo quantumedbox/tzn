@@ -4,14 +4,12 @@ set(PROJECT_NAME tzn-emu)
 project(${PROJECT_NAME} LANGUAGES C)
 
 set(VARIABLES "")
-set(INCLUDE_DIRS ${INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src/devices)
+set(INCLUDE_DIRS ${INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
 include_directories(${INCLUDE_DIRS} ${SDL2_SOURCE_DIR}/include ../include)
 
 if(NOT TZN_MODE)
   set(TZN_MODE "CLI")
 endif()
-
-file(GLOB SOURCE_FILES ./src/*.c)
 
 # TODO Make TZN_MODE depend on env variable
 if(TZN_MODE MATCHES "CLI")

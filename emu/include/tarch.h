@@ -1,5 +1,6 @@
 /*
   Specifies implementation details for referred target
+  Serves as kind of build system that is encapsulated without C itself
 
   # Required definitions
     - T_CPU_C -- Specifies CPU source file
@@ -9,7 +10,8 @@
     - T_CTR_D -- Specifies controller device implementation
 
   # Possible definitions
-    - T_FLSYS -- Specifies that file system is available
+    - T_CMDARG -- Specifies that argc and argv are present
+    - T_IO_C -- Specifies IO implementation
     - T_TRM_D -- Specifies terminal device implementation
     - T_KBT_D -- Specifies ASCII keyboard device implementation
 */
@@ -27,7 +29,7 @@ enum {
 #define T_CPU_C "tcpu.c"
 #define T_DVCS_C "tdvcs.c"
 
-#if __CC65__ && __C64__
+#if defined(__CC65__) && defined(__C64__)
   #define T_ARCH taC64
   #define T_PG_N 174U
   #define T_CTR_D "dvcs/ctr/tlibc.c"
@@ -36,9 +38,10 @@ enum {
 #else
   /* If no file is routed - "modern" OS hosted PC is assumed, aka what's supposedly native for computer on which this is compiled */
   #define T_ARCH taSelf
-  #define T_PG_N 256U
-  #define T_FLSYS
-  #define T_CTR_D "dcvs/ctr/tlibc.c"
+  #define T_PG_N 255U
+  #define T_IO_C "tio.c"
+  #define T_CMDARG
+  #define T_CTR_D "dvcs/ctr/tlibc.c"
   #define T_TRM_D "dvcs/trm/tvt100.c"
   #ifdef _WIN32
     #define T_KBT_D "dvcs/kbt/tdos.c"
@@ -46,6 +49,10 @@ enum {
   /* TODO: Detect DOS */
 #endif
 
-#define T_SPINIT (T_PG_N * T_PG_SZ) /* Initial value of stack pointer */
+#define T_SPINIT (T_PG_N * T_PG_SZ) - 1U /* Initial value of stack pointer */
+
+#ifdef T_IO_C
+#include T_IO_C
+#endif
 
 #endif

@@ -34,7 +34,7 @@ T_U8 def_rom[] = {
 */
 
 /* Sets CPU initial RAM state on startup */
-#ifdef T_FLSYS
+#ifdef T_IO_C
   static const char* filename;
 
   #define T_ROM_IN(mem, sz) { \
@@ -56,7 +56,7 @@ T_U8 def_rom[] = {
 
 #include T_CPU_C
 
-#ifdef T_FLSYS
+#if defined(T_CMDARG) && defined(T_IO_C)
   int
   main(int argc, char** argv)
   {

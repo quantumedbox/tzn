@@ -36,22 +36,6 @@ updCurXY(void)
 }
 
 void
-tTrmInIn(void)
-{
-  T_U16 idx;
-
-  tTrmPosX = 0;
-  tTrmPosY = 0;
-  updCurXY();
-
-  fputs(T_CLR_SCR, stdout);
-
-  idx = T_TRM_WD * T_TRM_HG;
-  while (idx--)
-    tTrmScr[idx] = 0;
-}
-
-void
 tznTrmCX(T_U8 pos)
 {
   while (pos >= tTrmSzX)
@@ -102,4 +86,22 @@ tznTrmGC(T_U8 x, T_U8 y)
   return tTrmScr[x + y * tTrmSzX];
 }
 
-#include "dvcs/ttrm.c" /* General device impl */
+#include "dvcs/ttrm.c"
+
+static
+void
+tTrmInit(void)
+{
+  T_U16 idx;
+  tTrmStat = tsNone;
+
+  tTrmPosX = 0;
+  tTrmPosY = 0;
+  updCurXY();
+
+  fputs(T_CLR_SCR, stdout);
+
+  idx = T_TRM_WD * T_TRM_HG;
+  while (idx--)
+    tTrmScr[idx] = 0;
+}

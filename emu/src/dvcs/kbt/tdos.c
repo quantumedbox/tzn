@@ -6,12 +6,6 @@
 
 #include "tcmplr.h"
 
-void
-tKbtInIn(void)
-{
-  /* Empty */
-}
-
 T_U8
 tznKbtGC(void)
 {
@@ -22,3 +16,10 @@ tznKbtGC(void)
 }
 
 #include "dvcs/tkbt.c"
+
+static
+void
+tKbtInit(void)
+{
+  /* Empty */
+}
