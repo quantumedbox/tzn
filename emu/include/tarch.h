@@ -21,7 +21,8 @@
 
 enum {
   taSelf,
-  taC64
+  taC64,
+  taDOS
 };
 
 #define T_PG_SZ 256U /* Page size in bytes */
@@ -29,12 +30,22 @@ enum {
 #define T_CPU_C "tcpu.c"
 #define T_DVCS_C "tdvcs.c"
 
-#if defined(__CC65__) && defined(__C64__)
+#if defined(T_C64) || defined(__C64__)
+  /* Commodore 64 */
   #define T_ARCH taC64
   #define T_PG_N 174U
   #define T_CTR_D "dvcs/ctr/tlibc.c"
   #define T_TRM_D "dvcs/trm/tc64.c"
   #define T_KBT_D "dvcs/kbt/tc64.c"
+#elif defined(T_MSDOS) || defined(MSDOS) || defined(__MSDOS__) || defined(_MSDOS) || defined(__DOS__) /* TODO Check for DOS specifically */
+  /* MS DOS */
+  #define T_ARCH taDOS
+  #define T_PG_N 128U
+  #define T_IO_C "tio.c"
+  #define T_CMDARG
+  #define T_CTR_D "dvcs/ctr/tlibc.c"
+  #define T_TRM_D "dvcs/trm/tvt100.c"
+  #define T_KBT_D "dvcs/kbt/tdos.c"
 #else
   /* If no file is routed - "modern" OS hosted PC is assumed, aka what's supposedly native for computer on which this is compiled */
   #define T_ARCH taSelf
@@ -46,7 +57,6 @@ enum {
   #ifdef _WIN32
     #define T_KBT_D "dvcs/kbt/tdos.c"
   #endif
-  /* TODO: Detect DOS */
 #endif
 
 #define T_SPINIT (T_PG_N * T_PG_SZ) - 1U /* Initial value of stack pointer */

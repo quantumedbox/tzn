@@ -38,7 +38,7 @@
   #ifndef TZN_RLS
     #define TZN_DEAD() TZN_ASRT(0, "Reached unreachable")
   #else
-    #define TZN_DEAD() ((void)0) /* TODO Shouldn't be just ignored */
+    #define TZN_DEAD() /* TODO Shouldn't be just ignored */
   #endif
 #endif
 
