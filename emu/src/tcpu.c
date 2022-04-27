@@ -7,14 +7,9 @@
   ```
 */
 
-#include <stdio.h>
-#include <setjmp.h>
-
 #include "ttzn.h"
 #include "tio.h"
 #include "tasrt.h"
-
-static jmp_buf tCpuRest;
 
 /* TODO Must be zerosegment */
 /* Registers */
@@ -30,8 +25,6 @@ static T_U16 tCpuRgPC; /* 2 Program Counter 8-bit Registers */ /* TODO: Investig
 
 static T_U8 tCpuRam[T_PG_N * T_PG_SZ]; /* RAM mapping */
 
-#define tCpuRes_() longjmp(tCpuRest, 0)
-
 static T_U8 tCpuDvIn; /* Device intermediate, used for bypassing stack in device communication */
 #include T_DVCS_C
 
@@ -41,7 +34,6 @@ tznCpuEx(void)
 {
   /* Each sequential initialization of CPU starts from here */
   tznLog("Setting up jump...\n");
-  setjmp(tCpuRest);
 
   tznLog("Zeroing RAM...\n");
   tMemSet(tCpuRam, 0x00, T_PG_N * T_PG_SZ);
@@ -89,32 +81,32 @@ tznCpuEx(void)
               We need to have jump table, in unique implementation
       */
 
-      case iMOV0A:
+      case tiMOV0A:
       {
         tCpuRgA = 0;
         break;
       }
-      case iMOVAB:
+      case tiMOVAB:
       {
         tCpuRgB = tCpuRgA;
         break;
       }
-      case iMOVAC:
+      case tiMOVAC:
       {
         tCpuRgC = tCpuRgA;
         break;
       }
-      case iMOVAD:
+      case tiMOVAD:
       {
         tCpuRgD = tCpuRgA;
         break;
       }
-      case iMOVASL:
+      case tiMOVASL:
       {
         tCpuRgSL = tCpuRgA;
         break;
       }
-      case iMOVASH:
+      case tiMOVASH:
       {
         tCpuRgSH = tCpuRgA;
         break;
@@ -122,7 +114,7 @@ tznCpuEx(void)
 
       /* GAP */
 
-      case iMOVAM:
+      case tiMOVAM:
       {
         tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)] = tCpuRgA;
         break;
@@ -130,27 +122,27 @@ tznCpuEx(void)
 
       /* GAP */
 
-      case iMOVBA:
+      case tiMOVBA:
       {
         tCpuRgA = tCpuRgB;
         break;
       }
-      case iMOVCA:
+      case tiMOVCA:
       {
         tCpuRgA = tCpuRgC;
         break;
       }
-      case iMOVDA:
+      case tiMOVDA:
       {
         tCpuRgA = tCpuRgD;
         break;
       }
-      case iMOVSLA:
+      case tiMOVSLA:
       {
         tCpuRgA = tCpuRgSL;
         break;
       }
-      case iMOVSHA:
+      case tiMOVSHA:
       {
         tCpuRgA = tCpuRgSH;
         break;
@@ -158,25 +150,25 @@ tznCpuEx(void)
 
       /* GAP */
 
-      case iMOVMA:
+      case tiMOVMA:
       {
         tCpuRgA = tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)];
         break;
       }
-      case iADDB:
+      case tiADDB:
       {
         tCpuRgA += tCpuRgB;
         tCpuRgF = tCpuRgA == T_U8_MIN;
         break;
       }
-      case iSUBB:
+      case tiSUBB:
       {
         T_U8 res = tCpuRgA - tCpuRgB;
         tCpuRgF = res > tCpuRgA;
         tCpuRgA = res;
         break;
       }
-      case iMULB:
+      case tiMULB:
       {
         /* TODO Status flag needs testing */
         T_U8 res = tCpuRgA * tCpuRgB;
@@ -184,13 +176,13 @@ tznCpuEx(void)
         tCpuRgA = res;
         break;
       }
-      case iDIVB:
+      case tiDIVB:
       {
         /* TODO Handle division by zero */
         tCpuRgA = tCpuRgA / tCpuRgB;
         break;
       }
-      case iMODB:
+      case tiMODB:
       {
         /* TODO Handle division by zero */
         tCpuRgA = tCpuRgA % tCpuRgB;
@@ -201,27 +193,27 @@ tznCpuEx(void)
       /* GAP */
       /* GAP */
 
-      case iINCA:
+      case tiINCA:
       {
         tCpuRgF = ++tCpuRgA == T_U8_MIN;
         break;
       }
-      case iDECA:
+      case tiDECA:
       {
         tCpuRgF = --tCpuRgA == T_U8_MAX;
         break;
       }
-      case iINCB:
+      case tiINCB:
       {
         tCpuRgF = ++tCpuRgB == T_U8_MIN;
         break;
       }
-      case iDECB:
+      case tiDECB:
       {
         tCpuRgF = --tCpuRgB == T_U8_MAX;
         break;
       }
-      case iINCBC:
+      case tiINCBC:
       {
         if (++tCpuRgB == T_U8_MIN)
           tCpuRgF = ++tCpuRgC == T_U8_MIN;
@@ -229,7 +221,7 @@ tznCpuEx(void)
           tCpuRgF = 0x00;
         break;
       }
-      case iDECBC:
+      case tiDECBC:
       {
         if (--tCpuRgB == T_U8_MAX)
           tCpuRgF = --tCpuRgC == T_U8_MAX;
@@ -237,63 +229,63 @@ tznCpuEx(void)
           tCpuRgF = 0x00;
         break;
       }
-      case iINCM:
+      case tiINCM:
       {
         ++tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)];
         break;
       }
-      case iDECM:
+      case tiDECM:
       {
         --tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)];
         break;
       }
-      case iEQLB:
+      case tiEQLB:
       {
         tCpuRgF = tCpuRgA == tCpuRgB;
         break;
       }
-      case iCMPB:
+      case tiCMPB:
       {
         tCpuRgF = tCpuRgA < tCpuRgB;
         break;
       }
-      case iJMPRA:
+      case tiJMPRA:
       {
         T_U8 rel_addr = tCpuRam[tCpuRgA];
         T_U16SI8(tCpuRgPC, rel_addr);
         break;
       }
-      case iJMPCRA:
+      case tiJMPCRA:
       {
         T_U8 rel_addr = tCpuRam[tCpuRgA] * tCpuRgF;
         T_U16SI8(tCpuRgPC, rel_addr);
         break;
       }
-      case iDVCWA:
+      case tiDVCWA:
       {
         tCpuDvIn = tCpuRgA;
         tznDvcWr();
         break;
       }
-      case iDVCWM:
+      case tiDVCWM:
       {
         tCpuDvIn = tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)];
         tznDvcWr();
         break;
       }
-      case iDVCRA:
+      case tiDVCRA:
       {
         tznDvcRd();
         tCpuRgA = tCpuDvIn;
         break;
       }
-      case iDVCRM:
+      case tiDVCRM:
       {
         tznDvcRd();
         tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)] = tCpuDvIn;
         break;
       }
-      case iCALLBC:
+      case tiCALLBC:
       {
         /* Stack pointer should always point to free to rewrite spot */
         /* TODO Assert for SP underflow on debug */
@@ -306,7 +298,7 @@ tznCpuEx(void)
         tCpuRgPC = T_U16_INIT(tCpuRgB, tCpuRgC);
         break;
       }
-      case iRET:
+      case tiRET:
       {
         if (++tCpuRgSL == T_U8_MIN)
           ++tCpuRgSH;
@@ -316,40 +308,40 @@ tznCpuEx(void)
         T_U16_LSET(tCpuRgPC, tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)]);
         break;
       }
-      case iPUSHA:
+      case tiPUSHA:
       {
         tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = tCpuRgA;
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
         break;
       }
-      case iPUSHB:
+      case tiPUSHB:
       {
         tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = tCpuRgB;
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
         break;
       }
-      case iPOPA:
+      case tiPOPA:
       {
         if (++tCpuRgSL == T_U8_MIN)
           ++tCpuRgSH;
         tCpuRgA = tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)];
         break;
       }
-      case iPOPB:
+      case tiPOPB:
       {
         if (++tCpuRgSL == T_U8_MIN)
           ++tCpuRgSH;
         tCpuRgB = tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)];
         break;
       }
-      case iFLP:
+      case tiFLP:
       {
         tCpuRgF ^= 0x01;
         break;
       }
-      case iCARTOL:
+      case tiCARTOL:
       {
         tCpuRgF = (tCpuRgF & 0xFE) | ((tCpuRgF >> 0x01) & 0x01);
         break;
@@ -357,32 +349,32 @@ tznCpuEx(void)
 
       /* 1 Immediate Based Instructions */
 
-      case iMOVIA:
+      case tiMOVIA:
       {
         tCpuRgA = tCpuRam[tCpuRgPC++];
         break;
       }
-      case iMOVIB:
+      case tiMOVIB:
       {
         tCpuRgB = tCpuRam[tCpuRgPC++];
         break;
       }
-      case iMOVIC:
+      case tiMOVIC:
       {
         tCpuRgC = tCpuRam[tCpuRgPC++];
         break;
       }
-      case iMOVID:
+      case tiMOVID:
       {
         tCpuRgD = tCpuRam[tCpuRgPC++];
         break;
       }
-      case iMOVISL:
+      case tiMOVISL:
       {
         tCpuRgSL = tCpuRam[tCpuRgPC++];
         break;
       }
-      case iMOVISH:
+      case tiMOVISH:
       {
         tCpuRgSH = tCpuRam[tCpuRgPC++];
         break;
@@ -400,20 +392,20 @@ tznCpuEx(void)
       /* GAP */
       /* GAP */
 
-      case iADDI:
+      case tiADDI:
       {
         tCpuRgA += tCpuRam[tCpuRgPC++];
         tCpuRgF = tCpuRgA == T_U8_MIN;
         break;
       }
-      case iSUBI:
+      case tiSUBI:
       {
         T_U8 res = tCpuRgA - tCpuRam[tCpuRgPC++];
         tCpuRgF = res > tCpuRgA;
         tCpuRgA = res;
         break;
       }
-      case iMULI:
+      case tiMULI:
       {
         /* TODO Status flag needs testing */
         T_U8 mul = tCpuRam[tCpuRgPC++];
@@ -422,13 +414,13 @@ tznCpuEx(void)
         tCpuRgA = res;
         break;
       }
-      case iDIVI:
+      case tiDIVI:
       {
         /* TODO Handle division by zero */
         tCpuRgA = tCpuRgA / tCpuRam[tCpuRgPC++];
         break;
       }
-      case iMODI:
+      case tiMODI:
       {
         /* TODO Handle division by zero */
         tCpuRgA = tCpuRgA % tCpuRam[tCpuRgPC++];
@@ -448,29 +440,29 @@ tznCpuEx(void)
       /* GAP */
       /* GAP */
 
-      case iEQLI:
+      case tiEQLI:
       {
         tCpuRgF = tCpuRgA == tCpuRam[tCpuRgPC++];
         break;
       }
-      case iCMPI:
+      case tiCMPI:
       {
         tCpuRgF = tCpuRgA < tCpuRam[tCpuRgPC++];
         break;
       }
-      case iJMPRI:
+      case tiJMPRI:
       {
         T_U8 rel_addr = tCpuRam[tCpuRgPC++];
         T_U16SI8(tCpuRgPC, rel_addr);
         break;
       }
-      case iJMPCRI:
+      case tiJMPCRI:
       {
         T_U8 rel_addr = tCpuRam[tCpuRgPC++] * tCpuRgF;
         T_U16SI8(tCpuRgPC, rel_addr);
         break;
       }
-      case iDVCWI:
+      case tiDVCWI:
       {
         tCpuDvIn = tCpuRam[tCpuRgPC++];
         tznDvcWr();
@@ -481,7 +473,7 @@ tznCpuEx(void)
       /* GAP */
       /* GAP */
 
-      case iCALLRI:
+      case tiCALLRI:
       {
         T_U8 rel_addr = tCpuRam[tCpuRgPC++];
         tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = T_U16_LOW(tCpuRgPC);
@@ -496,26 +488,26 @@ tznCpuEx(void)
 
       /* 2 Immediate byte operating instructions */
 
-      case iMOVIMA:
+      case tiMOVIMA:
       {
         tCpuRgA = tCpuRam[T_U16_INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])];
         tCpuRgPC += 2;
         break;
       }
-      case iMOVIAM:
+      case tiMOVIAM:
       {
         tCpuRam[T_U16_INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])] = tCpuRgA;
         tCpuRgPC += 2;
         break;
       }
-      case iDVCRIM:
+      case tiDVCRIM:
       {
         tznDvcRd();
         tCpuRam[T_U16_INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])] = tCpuDvIn;
         tCpuRgPC += 2;
         break;
       }
-      case iCALLI:
+      case tiCALLI:
       {
         tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = T_U16_LOW(tCpuRgPC);
         if (--tCpuRgSL == T_U8_MAX)

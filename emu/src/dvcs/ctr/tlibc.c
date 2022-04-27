@@ -15,7 +15,7 @@ tznCtrSD(void)
 void
 tznCtrRS(void)
 {
-  tCpuRes_();
+  
 }
 
 #include "dvcs/tctr.c"

@@ -277,3 +277,4 @@
 -- Why CISC? --
   Mostly for resulting in more human readable, "declarative" assembly
   Also in memory and register count restricted environment it's more beneficial
+  6502 based CPUs don't have particularly good bit manipulation capabilities, so using instruction encoding could be quite costly

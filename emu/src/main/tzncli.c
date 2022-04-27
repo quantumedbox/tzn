@@ -5,17 +5,17 @@
 /* TODO: Implement mechanism for embedding custom ROMs */
 
 T_U8 def_rom[] = {
-  iMOVID, 0x01,
-  iMOVIB, 0x13,
-  iDVCWI, 0x14,
-  iDVCWM,
-  iMOVMA,
-  iEQLI, 0x00,
-  iJMPCRI, 3,
-  iINCBC,
-  iJMPRI, -9,
-  iMOVID, 0x00,
-  iDVCWI, 0x02,
+  tiMOVID, 0x01,
+  tiMOVIB, 0x13,
+  tiDVCWI, 0x14,
+  tiDVCWM,
+  tiMOVMA,
+  tiEQLI, 0x00,
+  tiJMPCRI, 3,
+  tiINCBC,
+  tiJMPRI, -9,
+  tiMOVID, 0x00,
+  tiDVCWI, 0x02,
   'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', 0x00
 };
 
