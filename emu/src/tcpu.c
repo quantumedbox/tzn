@@ -11,34 +11,31 @@
 #include "tio.h"
 #include "tasrt.h"
 
-/* TODO Must be zerosegment */
+/* TODO Must be zerosegment on 6502 */
 /* Registers */
-static T_U8 tCpuRgA;
-static T_U8 tCpuRgB;
-static T_U8 tCpuRgC;
-static T_U8 tCpuRgD;
-static T_U8 tCpuRgSL;
-static T_U8 tCpuRgSH;
-static T_U8 tCpuRgF; /* Flag Status Register */
+T_U8 tCpuRgA;
+T_U8 tCpuRgB;
+T_U8 tCpuRgC;
+T_U8 tCpuRgD;
+T_U8 tCpuRgSL;
+T_U8 tCpuRgSH;
+T_U8 tCpuRgF; /* Flag Status Register */
 
-static T_U16 tCpuRgPC; /* 2 Program Counter 8-bit Registers */ /* TODO: Investigate whether `register` keyword would make gains here */
+T_U16 tCpuRgPC; /* 2 Program Counter 8-bit Registers */ /* TODO: Investigate whether `register` keyword would make gains here */
 
-static T_U8 tCpuRam[T_PG_N * T_PG_SZ]; /* RAM mapping */
+T_U8 tCpuRam[T_PG_N * T_PG_SZ]; /* RAM mapping */
 
-static T_U8 tCpuDvIn; /* Device intermediate, used for bypassing stack in device communication */
+T_U8 tCpuDvIn; /* Device intermediate, used for bypassing stack in device communication */
+
 #include T_DVCS_C
 
-T_NORET
 void
-tznCpuEx(void)
+tCpuInit(void)
 {
-  /* Each sequential initialization of CPU starts from here */
-  tznLog("Setting up jump...\n");
-
-  tznLog("Zeroing RAM...\n");
+  tLog("Zeroing RAM...\n");
   tMemSet(tCpuRam, 0x00, T_PG_N * T_PG_SZ);
 
-  tznLog("Zeroing registers...\n");
+  tLog("Zeroing registers...\n");
   tCpuRgA = 0x00;
   tCpuRgB = 0x00;
   tCpuRgC = 0x00;
@@ -48,37 +45,36 @@ tznCpuEx(void)
   tCpuRgF = 0x00;
   tCpuRgPC = 0x00;
 
-  tznLog("Initializing cpu state...\n");
+  tLog("Initializing cpu state...\n");
   T_ROM_IN(tCpuRam, T_PG_N * T_PG_SZ);
 
-  tznLog("Initializing devices...\n");
-  tznDvcIn();
+  tLog("Initializing devices...\n");
+  tDvcInit();
+}
+
+T_NORET void tCpuExec(void);
+
+/*
+  This C implementation is used if target doesn't implement specific CPU execution model
+  It's portable but potentially too slow and code heavy for some of targets
+*/
+#ifndef T_CPUASM
+T_NORET
+void
+tCpuExec(void)
+{
+  tCpuInit();
 
   while (1)
   {
-#ifdef TZN_DUMP_EXEC_STATE
-    fprintf(
-      stdout,
-      "[PC: 0x%X | A: 0x%X | B: 0x%X | C: 0x%X | D: 0x%X | L: 0x%X | H: 0x%X | S: 0x%X]\n",
-      tCpuRgPC,
-      tCpuRgA,
-      tCpuRgB,
-      tCpuRgC,
-      tCpuRgD,
-      tCpuRgSL, /* TODO Combine L and H into one? Same as with PC, building U16 values all the time might be costly */
-      tCpuRgSH,
-      tCpuRgF
-    );
-#endif
     switch (tCpuRam[tCpuRgPC++])
     {
-      /* Register Based Instructions */
-
       /* TODO We need alternative way of dispatching that would allow for memory savings
               And in general we need to test how our target compilers are optimizing it if at all
 
          TODO CC65 Produces individual comparison for each and every branch which is unacceptable
               We need to have jump table, in unique implementation
+              https://www.nesdev.org/wiki/Jump_table
       */
 
       case tiMOV0A:
@@ -111,17 +107,11 @@ tznCpuEx(void)
         tCpuRgSH = tCpuRgA;
         break;
       }
-
-      /* GAP */
-
       case tiMOVAM:
       {
         tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)] = tCpuRgA;
         break;
       }
-
-      /* GAP */
-
       case tiMOVBA:
       {
         tCpuRgA = tCpuRgB;
@@ -147,9 +137,6 @@ tznCpuEx(void)
         tCpuRgA = tCpuRgSH;
         break;
       }
-
-      /* GAP */
-
       case tiMOVMA:
       {
         tCpuRgA = tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)];
@@ -188,11 +175,6 @@ tznCpuEx(void)
         tCpuRgA = tCpuRgA % tCpuRgB;
         break;
       }
-
-      /* GAP */
-      /* GAP */
-      /* GAP */
-
       case tiINCA:
       {
         tCpuRgF = ++tCpuRgA == T_U8_MIN;
@@ -346,9 +328,6 @@ tznCpuEx(void)
         tCpuRgF = (tCpuRgF & 0xFE) | ((tCpuRgF >> 0x01) & 0x01);
         break;
       }
-
-      /* 1 Immediate Based Instructions */
-
       case tiMOVIA:
       {
         tCpuRgA = tCpuRam[tCpuRgPC++];
@@ -379,19 +358,6 @@ tznCpuEx(void)
         tCpuRgSH = tCpuRam[tCpuRgPC++];
         break;
       }
-
-      /* GAP */
-      /* GAP */
-
-      /* GAP */
-      /* GAP */
-      /* GAP */
-      /* GAP */
-      /* GAP */
-      /* GAP */
-      /* GAP */
-      /* GAP */
-
       case tiADDI:
       {
         tCpuRgA += tCpuRam[tCpuRgPC++];
@@ -426,20 +392,6 @@ tznCpuEx(void)
         tCpuRgA = tCpuRgA % tCpuRam[tCpuRgPC++];
         break;
       }
-
-      /* GAP */
-      /* GAP */
-      /* GAP */
-
-      /* GAP */
-      /* GAP */
-      /* GAP */
-      /* GAP */
-      /* GAP */
-      /* GAP */
-      /* GAP */
-      /* GAP */
-
       case tiEQLI:
       {
         tCpuRgF = tCpuRgA == tCpuRam[tCpuRgPC++];
@@ -468,11 +420,6 @@ tznCpuEx(void)
         tznDvcWr();
         break;
       }
-      /* GAP */
-
-      /* GAP */
-      /* GAP */
-
       case tiCALLRI:
       {
         T_U8 rel_addr = tCpuRam[tCpuRgPC++];
@@ -485,9 +432,6 @@ tznCpuEx(void)
         T_U16SI8(tCpuRgPC, rel_addr);
         break;
       }
-
-      /* 2 Immediate byte operating instructions */
-
       case tiMOVIMA:
       {
         tCpuRgA = tCpuRam[T_U16_INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])];
@@ -518,7 +462,6 @@ tznCpuEx(void)
         tCpuRgPC = tCpuRam[T_U16_INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])];
         break;
       }
-
       default: {
         TZN_ASRT(0, "Instruction not implemented");
       }
@@ -526,3 +469,4 @@ tznCpuEx(void)
   }
   TZN_DEAD();
 }
+#endif

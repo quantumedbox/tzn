@@ -22,27 +22,33 @@
 #define tMemSet(dest, val, bytes)   memset(dest, val, (size_t)bytes)
 #define tMemCopy(dest, src, bytes)  memcpy(dest, src, (size_t)bytes)
 
-void tTrmPrLt(const char* literal); /* Use terminal device implementation for printing */
+#define tHalt() while (1) {} /* TODO We need to ensure halting, probably by using asm for every specific target */
 
-/*
-  @brief  Print null terminated string holding error message and then exit
-  @warn   Preferably only const literals should be passed here, don't mess with null strings
-*/
-#define tError(literal) do { \
-  tTrmPrLt("error: "); \
-  tTrmPrLt(literal); \
-  exit(EXIT_FAILURE); \
-} while (0)
-
-#define tPrint(literal) tTrmPrLt(literal)
-
-#ifndef TZN_RLS
-  #define tznLog(literal) tPrint(literal)
+#ifdef T_TRM_D
+  void tTrmPrLt(const char* literal); /* Use terminal device implementation for printing */
+  /*
+    @brief  Print null terminated string holding error message and then exit
+    @warn   Preferably only const literals should be passed here, don't mess with null strings
+  */
+  #define tError(literal) do { \
+    tTrmPrLt("error: "); \
+    tTrmPrLt(literal); \
+    tHalt(); \
+  } while (0)
+  #define tPrint(literal) tTrmPrLt(literal)
 #else
-  #define tznLog(literal) (void)(0)
+  #define tError(_) do { \
+    tHalt(); \
+  } while (0)
 #endif
 
-#ifdef T_FLSYS
+#ifndef TZN_RLS
+  #define tLog(literal) tPrint(literal)
+#else
+  #define tLog(literal) (void)(0)
+#endif
+
+#ifdef T_IO_C
   /*
     @brief  Read contents of file at filename to memory buffer of specified size
             Flags dictate behaviour

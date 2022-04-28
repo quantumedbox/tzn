@@ -27,7 +27,7 @@ enum {
 /* Initializing is setting devices up in their startup state */
 static
 void
-tznDvcIn(void)
+tDvcInit(void)
 {
   tCtrInit();
 #ifdef T_TRM_D
@@ -38,7 +38,6 @@ tznDvcIn(void)
 #endif
 }
 
-static
 void
 tznDvcWr(void)
 {
@@ -70,7 +69,6 @@ tznDvcWr(void)
   }
 }
 
-static
 void
 tznDvcRd(void)
 {

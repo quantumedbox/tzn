@@ -4,6 +4,7 @@
 
 /* TODO: Implement mechanism for embedding custom ROMs */
 
+/*
 T_U8 def_rom[] = {
   tiMOVID, 0x01,
   tiMOVIB, 0x13,
@@ -18,20 +19,20 @@ T_U8 def_rom[] = {
   tiDVCWI, 0x02,
   'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', 0x00
 };
-
-/*
-T_U8 def_rom[] = {
-  iMOVID, 0x01,
-  iDVCWI, 0x10,
-  iDVCRA,
-  iEQLI, 0x00,
-  iJMPCRI, -7,
-  iMOVID, 0x00,
-  iDVCWI, 0x13,
-  iDVCWA,
-  iJMPRI, -16
-};
 */
+
+T_U8 def_rom[] = {
+  tiMOVID, 0x01,
+  tiDVCWI, 0x14,
+  tiMOVIB, 0x11,
+  tiDVCWM,
+  tiMOVMA,
+  tiEQLI, 0x00,
+  tiJMPCRI, -11,
+  tiINCBC,
+  tiJMPRI, -9,
+  'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', 0x00
+};
 
 /* Sets CPU initial RAM state on startup */
 #ifdef T_IO_C
@@ -63,7 +64,7 @@ T_U8 def_rom[] = {
     if (argc > 1)
       filename = argv[1];
 
-    tznCpuEx();
+    tCpuExec();
     return 0;
   }
 
@@ -71,7 +72,7 @@ T_U8 def_rom[] = {
   int
   main()
   {
-    tznCpuEx();
+    tCpuExec();
     return 0;
   }
 #endif

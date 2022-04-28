@@ -9,7 +9,7 @@ T_NORET
 void
 tznCtrSD(void)
 {
-  exit(EXIT_SUCCESS);
+  tHalt();
 }
 
 void
