@@ -1,3 +1,5 @@
+!! OUTDATED
+
 [- TZN Architecture Overview, Revision 1 -]
 
 -- To Reader --

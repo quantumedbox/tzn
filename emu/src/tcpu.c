@@ -15,7 +15,7 @@
 T_U8 tCpuRgA;
 
 T_U8 tCpuRgBC[2];
-#define tCpuRgB tCpuRgBC[0]
+#define tCpuRgB tCpuRgBC[0] /* TODO Make sure that endianess is valid for target, we just assume little endian at this point */
 #define tCpuRgC tCpuRgBC[1]
 
 T_U8 tCpuRgD;
@@ -41,13 +41,14 @@ tCpuInit(void)
   tLog("Zeroing RAM...\n");
   tMemSet(tCpuRam, 0x00, T_PG_N * T_PG_SZ);
 
+  /* TODO Is it necessary? C guarantees that static variables are initialized */
   tLog("Zeroing registers...\n");
   tCpuRgA = 0x00;
   tCpuRgB = 0x00;
   tCpuRgC = 0x00;
   tCpuRgD = 0x00;
-  tCpuRgSL = T_U16LOW(T_SPINIT);
-  tCpuRgSH = T_U16HIGH(T_SPINIT);
+  tCpuRgSL = 0x00;
+  tCpuRgSH = 0x00;
   tCpuRgF = 0x00;
   tCpuRgPC = 0x00;
 

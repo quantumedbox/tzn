@@ -67,6 +67,4 @@
 #define tiDVCRIM (unsigned char)61  /* Device read from D port to immediate absolute memory address */
 #define tiCALLI (unsigned char)62   /* Store address at [SL SH] and perform jump to immediate absolute byte */
 
-/* Next free estate for expansion sets */
-
 #endif

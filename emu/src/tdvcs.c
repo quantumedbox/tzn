@@ -14,6 +14,13 @@
 #endif
 
 /*
+  TODO What about interrupt device?
+  For supporting something in the lines of http://6502.org/source/kernels/minikernel.txt
+  Might be quite problematic to make it portable tho
+  Also, it should be possible to implement scheduler purely in TZN with available timer at this point
+*/
+
+/*
   Ports are hardcoded and particular device always is at the same memory address no mater the implementation
   Order of them matters as dispatching might be done via sequence of if-else branches, so, the most used devices should come first
   Controller is always assumed to be the last device

@@ -30,10 +30,10 @@ enum {
 #define T_CPU_C "tcpu.c"
 #define T_DVCS_C "tdvcs.c"
 
-#if defined(T_C64) || defined(__C64__)
+#if defined(__C64__)
   /* Commodore 64 */
   #define T_ARCH taC64
-  #define T_PG_N 174U
+  #define T_PG_N 175U
   #define T_CTR_D "dvcs/ctr/tlibc.c"
   #define T_TRM_D "dvcs/trm/tc64.c"
   #define T_KBT_D "dvcs/kbt/tc64.c"
@@ -58,8 +58,6 @@ enum {
     #define T_KBT_D "dvcs/kbt/tdos.c"
   #endif
 #endif
-
-#define T_SPINIT (T_PG_N * T_PG_SZ) - 1U /* Initial value of stack pointer */
 
 #ifdef T_IO_C
 #include T_IO_C
