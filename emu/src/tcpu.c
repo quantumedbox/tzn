@@ -11,20 +11,26 @@
 #include "tio.h"
 #include "tasrt.h"
 
-/* TODO Must be zerosegment on 6502 */
-/* Registers */
+/* TODO Must be zerosegment on 6502, but looks like it would require messing with linker */
 T_U8 tCpuRgA;
-T_U8 tCpuRgB;
-T_U8 tCpuRgC;
+
+T_U8 tCpuRgBC[2];
+#define tCpuRgB tCpuRgBC[0]
+#define tCpuRgC tCpuRgBC[1]
+
 T_U8 tCpuRgD;
-T_U8 tCpuRgSL;
-T_U8 tCpuRgSH;
+
+T_U8 tCpuRgS[2];
+#define tCpuRgSL tCpuRgS[0]
+#define tCpuRgSH tCpuRgS[1]
+
 T_U8 tCpuRgF; /* Flag Status Register */
 
-T_U16 tCpuRgPC; /* 2 Program Counter 8-bit Registers */ /* TODO: Investigate whether `register` keyword would make gains here */
+T_U16 tCpuRgPC; /* 2 Program Counter 8-bit Registers */
 
 T_U8 tCpuRam[T_PG_N * T_PG_SZ]; /* RAM mapping */
 
+/* TODO Rename to reflect that it's general temporary, not just device one */
 T_U8 tCpuDvIn; /* Device intermediate, used for bypassing stack in device communication */
 
 #include T_DVCS_C
@@ -40,8 +46,8 @@ tCpuInit(void)
   tCpuRgB = 0x00;
   tCpuRgC = 0x00;
   tCpuRgD = 0x00;
-  tCpuRgSL = T_U16_LOW(T_SPINIT);
-  tCpuRgSH = T_U16_HIGH(T_SPINIT);
+  tCpuRgSL = T_U16LOW(T_SPINIT);
+  tCpuRgSH = T_U16HIGH(T_SPINIT);
   tCpuRgF = 0x00;
   tCpuRgPC = 0x00;
 
@@ -65,18 +71,14 @@ tCpuExec(void)
 {
   tCpuInit();
 
+  /* PC and DvIn are zeroed on startup and thus will not change state */
+  PC_RELJMP:
+    T_U16SI8(tCpuRgPC, tCpuDvIn);
+
   while (1)
   {
     switch (tCpuRam[tCpuRgPC++])
     {
-      /* TODO We need alternative way of dispatching that would allow for memory savings
-              And in general we need to test how our target compilers are optimizing it if at all
-
-         TODO CC65 Produces individual comparison for each and every branch which is unacceptable
-              We need to have jump table, in unique implementation
-              https://www.nesdev.org/wiki/Jump_table
-      */
-
       case tiMOV0A:
       {
         tCpuRgA = 0;
@@ -109,7 +111,7 @@ tCpuExec(void)
       }
       case tiMOVAM:
       {
-        tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)] = tCpuRgA;
+        tCpuRam[(T_U16)tCpuRgB] = tCpuRgA;
         break;
       }
       case tiMOVBA:
@@ -139,7 +141,7 @@ tCpuExec(void)
       }
       case tiMOVMA:
       {
-        tCpuRgA = tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)];
+        tCpuRgA = tCpuRam[(T_U16)tCpuRgB];
         break;
       }
       case tiADDB:
@@ -213,12 +215,12 @@ tCpuExec(void)
       }
       case tiINCM:
       {
-        ++tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)];
+        ++tCpuRam[(T_U16)tCpuRgB];
         break;
       }
       case tiDECM:
       {
-        --tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)];
+        --tCpuRam[(T_U16)tCpuRgB];
         break;
       }
       case tiEQLB:
@@ -233,15 +235,13 @@ tCpuExec(void)
       }
       case tiJMPRA:
       {
-        T_U8 rel_addr = tCpuRam[tCpuRgA];
-        T_U16SI8(tCpuRgPC, rel_addr);
-        break;
+        tCpuDvIn = tCpuRam[tCpuRgA];
+        goto PC_RELJMP;
       }
       case tiJMPCRA:
       {
-        T_U8 rel_addr = tCpuRam[tCpuRgA] * tCpuRgF;
-        T_U16SI8(tCpuRgPC, rel_addr);
-        break;
+        tCpuDvIn = tCpuRam[tCpuRgA] * tCpuRgF;
+        goto PC_RELJMP;
       }
       case tiDVCWA:
       {
@@ -251,7 +251,7 @@ tCpuExec(void)
       }
       case tiDVCWM:
       {
-        tCpuDvIn = tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)];
+        tCpuDvIn = tCpuRam[(T_U16)tCpuRgB];
         tznDvcWr();
         break;
       }
@@ -264,42 +264,42 @@ tCpuExec(void)
       case tiDVCRM:
       {
         tznDvcRd();
-        tCpuRam[T_U16_INIT(tCpuRgB, tCpuRgC)] = tCpuDvIn;
+        tCpuRam[(T_U16)tCpuRgB] = tCpuDvIn;
         break;
       }
       case tiCALLBC:
       {
         /* Stack pointer should always point to free to rewrite spot */
         /* TODO Assert for SP underflow on debug */
-        tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = T_U16_LOW(tCpuRgPC);
+        tCpuRam[(T_U16)tCpuRgSL] = T_U16LOW(tCpuRgPC);
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
-        tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = T_U16_HIGH(tCpuRgPC);
+        tCpuRam[(T_U16)tCpuRgSL] = T_U16HIGH(tCpuRgPC);
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
-        tCpuRgPC = T_U16_INIT(tCpuRgB, tCpuRgC);
+        tCpuRgPC = (T_U16)tCpuRgB;
         break;
       }
       case tiRET:
       {
         if (++tCpuRgSL == T_U8_MIN)
           ++tCpuRgSH;
-        T_U16_HSET(tCpuRgPC, tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)]);
+        T_U16SETH(tCpuRgPC, tCpuRam[(T_U16)tCpuRgSL]);
         if (++tCpuRgSL == T_U8_MIN)
           ++tCpuRgSH;
-        T_U16_LSET(tCpuRgPC, tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)]);
+        T_U16SETL(tCpuRgPC, tCpuRam[(T_U16)tCpuRgSL]);
         break;
       }
       case tiPUSHA:
       {
-        tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = tCpuRgA;
+        tCpuRam[(T_U16)tCpuRgSL] = tCpuRgA;
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
         break;
       }
       case tiPUSHB:
       {
-        tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = tCpuRgB;
+        tCpuRam[(T_U16)tCpuRgSL] = tCpuRgB;
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
         break;
@@ -308,14 +308,14 @@ tCpuExec(void)
       {
         if (++tCpuRgSL == T_U8_MIN)
           ++tCpuRgSH;
-        tCpuRgA = tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)];
+        tCpuRgA = tCpuRam[(T_U16)tCpuRgSL];
         break;
       }
       case tiPOPB:
       {
         if (++tCpuRgSL == T_U8_MIN)
           ++tCpuRgSH;
-        tCpuRgB = tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)];
+        tCpuRgB = tCpuRam[(T_U16)tCpuRgSL];
         break;
       }
       case tiFLP:
@@ -404,15 +404,13 @@ tCpuExec(void)
       }
       case tiJMPRI:
       {
-        T_U8 rel_addr = tCpuRam[tCpuRgPC++];
-        T_U16SI8(tCpuRgPC, rel_addr);
-        break;
+        tCpuDvIn = tCpuRam[tCpuRgPC++];
+        goto PC_RELJMP;
       }
       case tiJMPCRI:
       {
-        T_U8 rel_addr = tCpuRam[tCpuRgPC++] * tCpuRgF;
-        T_U16SI8(tCpuRgPC, rel_addr);
-        break;
+        tCpuDvIn = tCpuRam[tCpuRgPC++] * tCpuRgF;
+        goto PC_RELJMP;
       }
       case tiDVCWI:
       {
@@ -422,44 +420,43 @@ tCpuExec(void)
       }
       case tiCALLRI:
       {
-        T_U8 rel_addr = tCpuRam[tCpuRgPC++];
-        tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = T_U16_LOW(tCpuRgPC);
+        tCpuDvIn = tCpuRam[tCpuRgPC++];
+        tCpuRam[(T_U16)tCpuRgSL] = T_U16LOW(tCpuRgPC);
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
-        tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = T_U16_HIGH(tCpuRgPC);
+        tCpuRam[(T_U16)tCpuRgSL] = T_U16HIGH(tCpuRgPC);
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
-        T_U16SI8(tCpuRgPC, rel_addr);
-        break;
+        goto PC_RELJMP;
       }
       case tiMOVIMA:
       {
-        tCpuRgA = tCpuRam[T_U16_INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])];
+        tCpuRgA = tCpuRam[T_U16INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])];
         tCpuRgPC += 2;
         break;
       }
       case tiMOVIAM:
       {
-        tCpuRam[T_U16_INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])] = tCpuRgA;
+        tCpuRam[T_U16INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])] = tCpuRgA;
         tCpuRgPC += 2;
         break;
       }
       case tiDVCRIM:
       {
         tznDvcRd();
-        tCpuRam[T_U16_INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])] = tCpuDvIn;
+        tCpuRam[T_U16INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])] = tCpuDvIn;
         tCpuRgPC += 2;
         break;
       }
       case tiCALLI:
       {
-        tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = T_U16_LOW(tCpuRgPC);
+        tCpuRam[(T_U16)tCpuRgSL] = T_U16LOW(tCpuRgPC);
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
-        tCpuRam[T_U16_INIT(tCpuRgSL, tCpuRgSH)] = T_U16_HIGH(tCpuRgPC);
+        tCpuRam[(T_U16)tCpuRgSL] = T_U16HIGH(tCpuRgPC);
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
-        tCpuRgPC = tCpuRam[T_U16_INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])];
+        tCpuRgPC = tCpuRam[T_U16INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])];
         break;
       }
       default: {

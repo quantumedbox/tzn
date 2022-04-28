@@ -13,7 +13,11 @@
 #include TZN_KBT_D
 #endif
 
-/* Ports are dependent on availability of devices, no assumptions should be made about their order */
+/*
+  Ports are hardcoded and particular device always is at the same memory address no mater the implementation
+  Order of them matters as dispatching might be done via sequence of if-else branches, so, the most used devices should come first
+  Controller is always assumed to be the last device
+*/
 enum {
    dvCtr
 #ifdef T_TRM_D

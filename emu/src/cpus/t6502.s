@@ -21,6 +21,8 @@
 
 .export   _tCpuExec
 
+; TODO Use native carry / underflow / overflow flags for instructions that need it
+
 ; ---------------------------------------------------------------
 ; void __near__ tCpuExec (void)
 ; ---------------------------------------------------------------
@@ -176,6 +178,7 @@ L0002:
   bne     L0005
   inc     _tCpuRgPC+1
 L0005:
+  ; TODO Check whether instruction is in range? Could hinder the performance quite a bit tho
   pla
   tax
   lda     table_low,x

@@ -4,34 +4,17 @@
 
 /* TODO: Implement mechanism for embedding custom ROMs */
 
-/*
-T_U8 def_rom[] = {
-  tiMOVID, 0x01,
-  tiMOVIB, 0x13,
-  tiDVCWI, 0x14,
-  tiDVCWM,
-  tiMOVMA,
-  tiEQLI, 0x00,
-  tiJMPCRI, 3,
-  tiINCBC,
-  tiJMPRI, -9,
-  tiMOVID, 0x00,
-  tiDVCWI, 0x02,
-  'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', 0x00
-};
-*/
-
 T_U8 def_rom[] = {
   tiMOVID, 0x01,
   tiDVCWI, 0x14,
-  tiMOVIB, 0x11,
+  tiMOVIB, 0x0F,
   tiDVCWM,
   tiMOVMA,
   tiEQLI, 0x00,
   tiJMPCRI, -11,
   tiINCBC,
   tiJMPRI, -9,
-  'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', 0x00
+  'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', ' ', 0x00
 };
 
 /* Sets CPU initial RAM state on startup */
@@ -58,15 +41,15 @@ T_U8 def_rom[] = {
 #include T_CPU_C
 
 #if defined(T_CMDARG) && defined(T_IO_C)
-  int
-  main(int argc, char** argv)
-  {
-    if (argc > 1)
-      filename = argv[1];
+    int
+    main(int argc, char** argv)
+    {
+      if (argc > 1)
+        filename = argv[1];
 
-    tCpuExec();
-    return 0;
-  }
+      tCpuExec();
+      return 0;
+    }
 
 #else
   int

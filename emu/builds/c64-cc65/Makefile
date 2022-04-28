@@ -6,7 +6,7 @@ CPU_EXEC := $(BASE)/src/cpus/t6502.s
 MAIN := $(BASE)/src/main/tzncli.c
 
 ASMFLAGS := --relax-checks --smart
-CCFLAGS := --standard c89 -Cl -r $(addprefix --asm-args ,$(ASMFLAGS)) -DT_CPUASM
+CCFLAGS := --standard c89 -Cl -r $(addprefix --asm-args ,$(ASMFLAGS)) # -DT_CPUASM
 
 RELEASEFLAGS := -Osir -DTZN_RLS
 DEBUGFLAGS := -g --check-stack
@@ -22,10 +22,10 @@ CCFLAGS += $(RELEASEFLAGS)
 all: clean $(NAME)
 
 asm: $(CPU_EXEC:.s=.o)
-	cl65 -t c64 -S $(CCFLAGS) $(INC) $(MAIN) $(notdir $<)
+	cl65 -t c64 -S $(CCFLAGS) $(INC) $(MAIN) # $(notdir $<)
 
 $(NAME): $(CPU_EXEC:.s=.o)
-	cl65 -t c64 $(CCFLAGS) $(INC) -o $@ $(MAIN) $(notdir $<)
+	cl65 -t c64 $(CCFLAGS) $(INC) -o $@ $(MAIN) # $(notdir $<)
 
 %.o: %.s
 	ca65 -t c64 $(ASMFLAGS) -o $(notdir $@) $<

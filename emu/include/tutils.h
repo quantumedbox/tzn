@@ -6,13 +6,13 @@
   Better swap them to pure functions
 */
 
-#define T_U16_INIT(low, high) (((T_U16)(high) << 8) | (T_U16)(low))
-#define T_U16_LOW(v) ((v) & 0x00FF)
-#define T_U16_HIGH(v) (((v) & 0xFF00) >> 8)
+#define T_U16INIT(low, high) (((T_U16)(high) << 8) | (T_U16)(low))
+#define T_U16LOW(v) ((v) & 0x00FF)
+#define T_U16HIGH(v) (((v) & 0xFF00) >> 8)
 /* Set low byte */
-#define T_U16_LSET(v, byte) do { v = ((v) & 0xFF00) | (byte); } while (0)
+#define T_U16SETL(v, byte) do { v = ((v) & 0xFF00) | (byte); } while (0)
 /* Set high byte */
-#define T_U16_HSET(v, byte) do { v = ((v) & 0x00FF) | ((byte) << 8); } while (0)
+#define T_U16SETH(v, byte) do { v = ((v) & 0x00FF) | ((byte) << 8); } while (0)
 
 /* Subtraction of signed 8 bit integer from 16 unsigned one */
 #define T_U16SI8(sbtrhnd, sbtrctr) \

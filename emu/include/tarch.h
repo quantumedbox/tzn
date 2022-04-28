@@ -22,7 +22,7 @@
 enum {
   taSelf,
   taC64,
-  taDOS
+  taMSDOS
 };
 
 #define T_PG_SZ 256U /* Page size in bytes */
@@ -37,9 +37,9 @@ enum {
   #define T_CTR_D "dvcs/ctr/tlibc.c"
   #define T_TRM_D "dvcs/trm/tc64.c"
   #define T_KBT_D "dvcs/kbt/tc64.c"
-#elif defined(T_MSDOS) || defined(MSDOS) || defined(__MSDOS__) || defined(_MSDOS) || defined(__DOS__) /* TODO Check for DOS specifically */
+#elif defined(MSDOS) || defined(__MSDOS__) || defined(_MSDOS) || defined(__DOS__) /* TODO Check for DOS specifically */
   /* MS DOS */
-  #define T_ARCH taDOS
+  #define T_ARCH taMSDOS
   #define T_PG_N 128U
   #define T_IO_C "tio.c"
   #define T_CMDARG
