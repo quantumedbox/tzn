@@ -5,14 +5,9 @@
 #include "tcmplr.h"
 #include "tio.h"
 
-#define T_TRM_WD 40
-#define T_SCR_SZ 1000
-
-const T_U8 tTrmSzX = T_TRM_WD; /* Width */
-const T_U8 tTrmSzY = 25; /* Height */
-
-static T_U8 tTrmPosX;
-static T_U8 tTrmPosY;
+#define T_TRM_WD (T_U8)40U /* Width */
+#define T_TRM_HG (T_U8)25U /* Height */
+#define T_SCR_SZ 1000U /* Screen buffer size */
 
 static T_U8* tTrmScrM = (T_U8*)(void*)0x0400;
 static T_U8* tTrmXM = (T_U8*)(void*)0x00D3;
@@ -20,9 +15,10 @@ static T_U8* tTrmYM = (T_U8*)(void*)0x00D6;
 static T_U8* tTrmVM = (T_U8*)(void*)0x00CC;
 
 /* Translate ASCII to default C64 character set */
+/* TODO Inline it */
 static
 T_U8
-frASCII(T_U8 ch)
+tTrmFrAs(T_U8 ch)
 {
   /* TODO Handle all cases somehow */
   if ((ch >= 0x40) && (ch < 0x60))
@@ -35,7 +31,7 @@ frASCII(T_U8 ch)
 
 static
 T_U8
-toASCII(T_U8 ch)
+tTrmToAs(T_U8 ch)
 {
   /* TODO Handle all cases somehow */
   if (ch < 0x20)
@@ -44,70 +40,55 @@ toASCII(T_U8 ch)
     return ch;
 }
 
-T_HOT
 static
 void
-updCurXY(void)
-{
-  *tTrmXM = tTrmPosX;
-  *tTrmYM = tTrmPosY;
-}
-
-void
-tznTrmCX(T_U8 pos)
-{
-  while (pos >= tTrmSzX)
-    pos -= tTrmSzX;
-  tTrmPosX = pos;
-  updCurXY();
-}
-
-void
-tznTrmCY(T_U8 pos)
-{
-  while (pos >= tTrmSzY)
-    pos -= tTrmSzY;
-  tTrmPosY = pos;
-  updCurXY();
-}
-
-void
-tznTrmCV(T_U8 state)
-{
-  /* 0x00 - on, anything else - off */
-  *tTrmVM = !state;
-}
-
-T_HOT
-void
-tznTrmPC(T_U8 ch)
+tTrmPutC(void)
 {
   /* TODO Current implementation is suboptimal, but we need to prevent terminal from evaluating newlines and other symbols */
-  tTrmScrM[tTrmPosX + tTrmPosY * T_TRM_WD] = frASCII(ch);
-  if (tTrmSzX == (++tTrmPosX))
-  {
-    tTrmPosX = 0;
-    if (tTrmSzY == (++tTrmPosY))
-      tTrmPosY = 0;
+  tTrmScrM[tCpuRam[0x12] + tCpuRam[0x13] * T_TRM_WD] = tTrmFrAs(tCpuRam[0x16]);
+  if (T_TRM_WD == (++tCpuRam[0x12])) {
+    tCpuRam[0x12] = 0;
+    if (T_TRM_HG == (++tCpuRam[0x13]))
+      tCpuRam[0x13] = 0;
+    *tTrmYM = tCpuRam[0x13];
   }
-  updCurXY();
+  *tTrmXM = tCpuRam[0x12];
 }
 
-T_U8
-tznTrmGC(T_U8 x, T_U8 y)
-{
-  /* TODO Wrap X and Y pos? It would be better for implementation to state that wrapping is underfined */
-  return toASCII(tTrmScrM[x + y * T_TRM_WD]); /* TODO Translate C64 set to ASCII */
-}
-
-#include "dvcs/ttrm.c" /* General device impl */
-
-static
 void
-tTrmInit(void)
+tTrmPrLt(const char* literal)
 {
-  tTrmStat = tsNone;
-  tTrmPosX = 0;
-  tTrmPosY = 0;
-  tMemSet(tTrmScrM, 0x20, T_SCR_SZ);
+  while (*literal) {
+    tCpuRam[0x16] = *literal;
+    tTrmPutC();
+    ++literal;
+  }
 }
+
+/* TODO Should we wrap in such way? Cropping it might be enough */
+#define T_TRMFx2() do { \
+  while (tCpuRam[0x12] >= T_TRM_WD) \
+    tCpuRam[0x12] -= T_TRM_WD; \
+  *tTrmXM = tCpuRam[0x12]; \
+} while (0)
+
+/* TODO Should we wrap in such way? Cropping it might be enough */
+#define T_TRMFx3() do { \
+  while (tCpuRam[0x13] >= T_TRM_HG) \
+    tCpuRam[0x13] -= T_TRM_HG; \
+  *tTrmYM = tCpuRam[0x13]; \
+} while (0)
+
+#define T_TRMFx4() *tTrmVM = !tCpuRam[0x14] /* 0x00 - on, anything else - off */
+#define T_TRMFx6() tTrmPutC()
+
+/* TODO Should it be active on init? */
+#define T_TRMIN() do { \
+  tCpuRam[0x10] = T_TRM_WD; \
+  tCpuRam[0x11] = T_TRM_HG; \
+  tCpuRam[0x12] = 0x00; \
+  tCpuRam[0x13] = 0x00; \
+  tCpuRam[0x14] = 0x01; \
+  tCpuRam[0x1F] = 0x01; \
+  tMemSet(tTrmScrM, 0x20, T_SCR_SZ); \
+} while (0)

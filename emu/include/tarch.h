@@ -19,11 +19,9 @@
 #ifndef TARCH_H
 #define TARCH_H
 
-enum {
-  taSelf,
-  taC64,
-  taMSDOS
-};
+#define taSelf  0x00
+#define taMSDOS 0x01
+#define taC64   0x02
 
 #define T_PG_SZ 256U /* Page size in bytes */
 
@@ -32,14 +30,14 @@ enum {
 
 #if defined(__C64__)
   /* Commodore 64 */
-  #define T_ARCH taC64
-  #define T_PG_N 175U
+  #define T_HOSTID taC64
+  #define T_PG_N 176U
   #define T_CTR_D "dvcs/ctr/tlibc.c"
   #define T_TRM_D "dvcs/trm/tc64.c"
   #define T_KBT_D "dvcs/kbt/tc64.c"
 #elif defined(MSDOS) || defined(__MSDOS__) || defined(_MSDOS) || defined(__DOS__) /* TODO Check for DOS specifically */
   /* MS DOS */
-  #define T_ARCH taMSDOS
+  #define T_HOSTID taMSDOS
   #define T_PG_N 128U
   #define T_IO_C "tio.c"
   #define T_CMDARG
@@ -48,7 +46,7 @@ enum {
   #define T_KBT_D "dvcs/kbt/tdos.c"
 #else
   /* If no file is routed - "modern" OS hosted PC is assumed, aka what's supposedly native for computer on which this is compiled */
-  #define T_ARCH taSelf
+  #define T_HOSTID taSelf
   #define T_PG_N 255U
   #define T_IO_C "tio.c"
   #define T_CMDARG

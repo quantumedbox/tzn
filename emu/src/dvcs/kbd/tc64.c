@@ -37,7 +37,7 @@ void
 tznKbtGC(void)
 {
   /* TODO */
-  tCpuDvIn = mtxASCII[*mkport1][*mkport2];
+  tCpuTemp = mtxASCII[*mkport1][*mkport2];
 }
 
 #include "dvcs/tkbt.c"

@@ -12,46 +12,33 @@
 #include "tasrt.h"
 
 /* TODO Must be zerosegment on 6502, but looks like it would require messing with linker */
-T_U8 tCpuRgA;
+T_U8 tCpuRgA = 0x00;
 
-T_U8 tCpuRgBC[2];
+T_U8 tCpuRgBC[2] = { 0x00 };
 #define tCpuRgB tCpuRgBC[0] /* TODO Make sure that endianess is valid for target, we just assume little endian at this point */
 #define tCpuRgC tCpuRgBC[1]
 
-T_U8 tCpuRgD;
+T_U8 tCpuRgD = 0x00;
 
-T_U8 tCpuRgS[2];
+T_U8 tCpuRgS[2] = { 0x00 };
 #define tCpuRgSL tCpuRgS[0]
 #define tCpuRgSH tCpuRgS[1]
 
-T_U8 tCpuRgF; /* Flag Status Register */
+T_U8 tCpuRgF = 0x00; /* Flag Status Register */
 
-T_U16 tCpuRgPC; /* 2 Program Counter 8-bit Registers */
+/* TODO It's probably possible to have it represented as array of bytes too */
+T_U16 tCpuRgPC = 0x00; /* 2 Program Counter 8-bit Registers */
 
 T_U8 tCpuRam[T_PG_N * T_PG_SZ]; /* RAM mapping */
 
-/* TODO Rename to reflect that it's general temporary, not just device one */
-T_U8 tCpuDvIn; /* Device intermediate, used for bypassing stack in device communication */
+T_U8 tCpuTemp; /* Device intermediate, used for bypassing stack in device communication */
 
 #include T_DVCS_C
 
 void
 tCpuInit(void)
 {
-  tLog("Zeroing RAM...\n");
-  tMemSet(tCpuRam, 0x00, T_PG_N * T_PG_SZ);
-
-  /* TODO Is it necessary? C guarantees that static variables are initialized */
-  tLog("Zeroing registers...\n");
-  tCpuRgA = 0x00;
-  tCpuRgB = 0x00;
-  tCpuRgC = 0x00;
-  tCpuRgD = 0x00;
-  tCpuRgSL = 0x00;
-  tCpuRgSH = 0x00;
-  tCpuRgF = 0x00;
-  tCpuRgPC = 0x00;
-
+  /* TODO Should be embedded in ROM from the start */
   tLog("Initializing cpu state...\n");
   T_ROM_IN(tCpuRam, T_PG_N * T_PG_SZ);
 
@@ -63,9 +50,13 @@ T_NORET void tCpuExec(void);
 
 /*
   This C implementation is used if target doesn't implement specific CPU execution model
-  It's portable but potentially too slow and code heavy for some of targets
+  It's rather portable but potentially too slow and code heavy for some targets
 */
 #ifndef T_CPUASM
+
+/* TODO For big endian hosts it wouldn't work */
+#define T_RAMTOM(addr) (T_U16)addr /* Used for converting TZN memory layout to native address */
+
 T_NORET
 void
 tCpuExec(void)
@@ -74,7 +65,7 @@ tCpuExec(void)
 
   /* PC and DvIn are zeroed on startup and thus will not change state */
   PC_RELJMP:
-    T_U16SI8(tCpuRgPC, tCpuDvIn);
+    T_U16SI8(tCpuRgPC, tCpuTemp);
 
   while (1)
   {
@@ -161,6 +152,7 @@ tCpuExec(void)
       case tiMULB:
       {
         /* TODO Status flag needs testing */
+        /* TODO Potentially extremely slow, especially for compilers such as CC65 and SDCC */
         T_U8 res = tCpuRgA * tCpuRgB;
         tCpuRgF = ((tCpuRgA != 0) && ((res / tCpuRgA) != tCpuRgB));
         tCpuRgA = res;
@@ -236,37 +228,13 @@ tCpuExec(void)
       }
       case tiJMPRA:
       {
-        tCpuDvIn = tCpuRam[tCpuRgA];
+        tCpuTemp = tCpuRam[tCpuRgA];
         goto PC_RELJMP;
       }
       case tiJMPCRA:
       {
-        tCpuDvIn = tCpuRam[tCpuRgA] * tCpuRgF;
+        tCpuTemp = tCpuRam[tCpuRgA] * tCpuRgF;
         goto PC_RELJMP;
-      }
-      case tiDVCWA:
-      {
-        tCpuDvIn = tCpuRgA;
-        tznDvcWr();
-        break;
-      }
-      case tiDVCWM:
-      {
-        tCpuDvIn = tCpuRam[(T_U16)tCpuRgB];
-        tznDvcWr();
-        break;
-      }
-      case tiDVCRA:
-      {
-        tznDvcRd();
-        tCpuRgA = tCpuDvIn;
-        break;
-      }
-      case tiDVCRM:
-      {
-        tznDvcRd();
-        tCpuRam[(T_U16)tCpuRgB] = tCpuDvIn;
-        break;
       }
       case tiCALLBC:
       {
@@ -405,23 +373,17 @@ tCpuExec(void)
       }
       case tiJMPRI:
       {
-        tCpuDvIn = tCpuRam[tCpuRgPC++];
+        tCpuTemp = tCpuRam[tCpuRgPC++];
         goto PC_RELJMP;
       }
       case tiJMPCRI:
       {
-        tCpuDvIn = tCpuRam[tCpuRgPC++] * tCpuRgF;
+        tCpuTemp = tCpuRam[tCpuRgPC++] * tCpuRgF;
         goto PC_RELJMP;
-      }
-      case tiDVCWI:
-      {
-        tCpuDvIn = tCpuRam[tCpuRgPC++];
-        tznDvcWr();
-        break;
       }
       case tiCALLRI:
       {
-        tCpuDvIn = tCpuRam[tCpuRgPC++];
+        tCpuTemp = tCpuRam[tCpuRgPC++];
         tCpuRam[(T_U16)tCpuRgSL] = T_U16LOW(tCpuRgPC);
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
@@ -432,20 +394,13 @@ tCpuExec(void)
       }
       case tiMOVIMA:
       {
-        tCpuRgA = tCpuRam[T_U16INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])];
+        tCpuRgA = tCpuRam[T_RAMTOM(tCpuRam[tCpuRgPC])];
         tCpuRgPC += 2;
         break;
       }
       case tiMOVIAM:
       {
-        tCpuRam[T_U16INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])] = tCpuRgA;
-        tCpuRgPC += 2;
-        break;
-      }
-      case tiDVCRIM:
-      {
-        tznDvcRd();
-        tCpuRam[T_U16INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])] = tCpuDvIn;
+        tCpuRam[T_RAMTOM(tCpuRam[tCpuRgPC])] = tCpuRgA;
         tCpuRgPC += 2;
         break;
       }
@@ -457,7 +412,27 @@ tCpuExec(void)
         tCpuRam[(T_U16)tCpuRgSL] = T_U16HIGH(tCpuRgPC);
         if (--tCpuRgSL == T_U8_MAX)
           --tCpuRgSH;
-        tCpuRgPC = tCpuRam[T_U16INIT(tCpuRam[tCpuRgPC], tCpuRam[tCpuRgPC + 1])];
+        tCpuRgPC = tCpuRam[T_RAMTOM(tCpuRam[tCpuRgPC])];
+        break;
+      }
+      case tiFLSHI:
+      {
+        tCpuTemp = tCpuRam[tCpuRgPC++];
+        tDvcFlsh();
+        break;
+      }
+      case tiOUTIA:
+      {
+        tCpuTemp = tCpuRam[tCpuRgPC++];
+        tCpuRam[tCpuRgPC] = tCpuRgA;
+        tDvcFlsh();
+        break;
+      }
+      case tiOUTIM:
+      {
+        tCpuTemp = tCpuRam[tCpuRgPC++];
+        tCpuRam[tCpuRgPC] = tCpuRam[(T_U16)tCpuRgB];
+        tDvcFlsh();
         break;
       }
       default: {

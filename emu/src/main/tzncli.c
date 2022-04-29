@@ -4,16 +4,14 @@
 
 /* TODO: Implement mechanism for embedding custom ROMs */
 
-T_U8 def_rom[] = {
-  tiMOVID, 0x01,
-  tiDVCWI, 0x14,
+static const T_U8 def_rom[] = {
   tiMOVIB, 0x0F,
-  tiDVCWM,
+  tiOUTIM, 0x16,
   tiMOVMA,
   tiEQLI, 0x00,
-  tiJMPCRI, -11,
+  tiJMPCRI, -9,
   tiINCBC,
-  tiJMPRI, -9,
+  tiJMPRI, -10,
   'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', ' ', 0x00
 };
 

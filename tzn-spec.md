@@ -14,10 +14,10 @@ Devices are mapped at first page in memory (address range 0x0000-0x00FF), where 
 
 | Register | Name            | Access | Description  |
 | -------- | --------------- | ------ | ------------ |
-| 0x00     | Device ID       | R/W    | Used on flushing, valid values are 0x01-0x0F |
-| 0x01     | Device Present  | RF     | Says whether particular device hinted by Device ID register is present |
-| 0x02     | Memory Pages    | R      | Read-only value specifying how many pages of memory are available, where each page is 256 bytes |
-| 0x0F     | Host ID         | R      | Read-only value holding identity of host in which TZN is running [^list of hosts] |
+| 0x00     | Host ID         | R      | Read-only value holding identity of host in which TZN is running [^list of hosts] |
+| 0x01     | Device ID       | R/WF   | Value containing device that is reported in other device registers, valid values are 0x01-0x0F |
+| 0x02     | Device Present  | R      | Says whether particular device hinted by Device ID register is present |
+| 0x03     | Memory Pages    | R      | Read-only value specifying how many pages of memory are available, including device mapped page, where each page is 256 bytes |
 
 [^list of hosts]: tzn-spec.md#hosts
 
@@ -29,15 +29,23 @@ Devices are mapped at first page in memory (address range 0x0000-0x00FF), where 
 
 | Register | Name            | Access | Description  |
 | -------- | --------------- | ------ | ------------ |
-| 0x00     | Screen Width    | R      | Read-only value containing terminal width in characters |
-| 0x01     | Screen Height   | R      | Read-only value containing terminal height in characters |
-| 0x02     | Cursor X        | R/W    | Used on flushing |
-| 0x03     | Cursor Y        | R/W    | Used on flushing |
-| 0x04     | Cursor Visibility | R/WF | Non-zero value means that cursor is visible |
-| 0x05     | Char Access     | RF/WF  | Access to bytes in screen buffer pointed at Cursor X/Y, outputting doesn't change Cursor X/Y |
-| 0x06     | Char Out        | WF     | Outputs byte to screen buffer where position is pointed by Cursor X/Y registers, after which Cursor X is incremented and its carry is added to Cursor Y |
-<!-- | 0x0x     |                 |        | | -->
+| 0x10     | Screen Width    | R      | Read-only value containing terminal width in characters |
+| 0x11     | Screen Height   | R      | Read-only value containing terminal height in characters |
+| 0x12     | Cursor X        | R/WF   | |
+| 0x13     | Cursor Y        | R/WF   | |
+| 0x14     | Cursor Visibility | R/WF | Non-zero value means that cursor is visible |
+| 0x15     | Char Set        | WF     | Set screen cell pointed at Cursor X/Y |
+| 0x16     | Char Out        | WF     | Outputs byte to screen buffer where position is pointed by Cursor X/Y registers, after which Cursor X is incremented and its carry is added to Cursor Y |
+| 0x1F     | Active          | R/F    | Specifies whether terminal is initialized and ready to respond for output. It might be affected by initialization of other graphical devices that conflict with terminal. Flushing it will cause initialization of trm |
+
+<!-- To consider: -->
 <!-- | 0x0F     | Char Mode       | R/W    | Dictate how incoming bytes are interpreted, default value is TRM_CHMOD_ASCII | -->
+<!-- | 0x07     | Char Get        | FR     | Get screen cell pointed at Cursor X/Y | -->
+
+<!-- Template: -->
+<!-- | Register | Name            | Access | Description  | -->
+<!-- | -------- | --------------- | ------ | ------------ | -->
+<!-- | 0x0x     |                 |        |              | -->
 
 # Hosts
 List of all platforms that are somewhat supported at this point in time
@@ -46,8 +54,9 @@ List of all platforms that are somewhat supported at this point in time
 | ----- | -------- | ----------- | --- |
 | Self  | 0x00     | Virtual architecture that assumes the same PC on which runtime was compiled on | :heavy_check_mark: |
 | MSDOS | 0x01     | Intel 80806-based | :heavy_check_mark: |
-| C64   | 0x02     | Commodore 64, MOS 6502-based | :interrobang: |
+| C64   | 0x02     | Commodore 64, MOS 6502-based | :grey_question: |
 
-- :heavy_check_mark: Full support
-- :interrobang: Partial support
-- :x: No support
+Support descriptions:
+- :heavy_check_mark: Full
+- :grey_question: Partial
+- :x: None

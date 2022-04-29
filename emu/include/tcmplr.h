@@ -2,7 +2,6 @@
 #define TCMPLR_H
 
 #include "tzntyp.h"
-#include "tznlmt.h"
 
 #ifdef __CC65__
   #define T_HOTMEM(decl, sym) \

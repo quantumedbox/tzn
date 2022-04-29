@@ -429,7 +429,7 @@ L00B6:  lda     M0004
   sta     _tCpuRgPC+1
   jmp     L0002
 L00B7:  lda     _tCpuRgA
-  sta     _tCpuDvIn
+  sta     _tCpuTemp
   jsr     _tznDvcWr
   jmp     L0002
 L00B9:  lda     _tCpuRgB
@@ -440,11 +440,11 @@ L00B9:  lda     _tCpuRgB
   sta     ptr1+1
   ldy     #<(_tCpuRam)
   lda     (ptr1),y
-  sta     _tCpuDvIn
+  sta     _tCpuTemp
   jsr     _tznDvcWr
   jmp     L0002
 L0037:  jsr     _tznDvcRd
-  lda     _tCpuDvIn
+  lda     _tCpuTemp
   sta     _tCpuRgA
   jmp     L0002
 L0038:  jsr     _tznDvcRd
@@ -455,7 +455,7 @@ L0038:  jsr     _tznDvcRd
   lda     _tCpuRgC
   adc     #>(_tCpuRam)
   sta     ptr1+1
-  lda     _tCpuDvIn
+  lda     _tCpuTemp
   ldy     #$00
   sta     (ptr1),y
   jmp     L0002
@@ -890,7 +890,7 @@ L0076:  lda     _tCpuRgPC
   sta     ptr1+1
   ldy     #<(_tCpuRam)
   lda     (ptr1),y
-  sta     _tCpuDvIn
+  sta     _tCpuTemp
   inc     _tCpuRgPC
   bne     L0077
   inc     _tCpuRgPC+1
@@ -1065,7 +1065,7 @@ L0086:  sta     ptr1
   lda     sreg+1
   adc     #>(_tCpuRam)
   sta     ptr1+1
-  lda     _tCpuDvIn
+  lda     _tCpuTemp
   ldy     #$00
   sta     (ptr1),y
   lda     #$02
