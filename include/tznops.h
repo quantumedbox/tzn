@@ -2,8 +2,19 @@
 #define TOPS_H
 
 /* TODO Do we need bit operators? Feels like shift left right might be quite handy */
+/* TODO Indirect operations */
+/* TODO
+  We need to research actual use cases to determine how to make instruction set that would lead to producing minimal size code
 
-#define tiMOV0A (unsigned char)0
+  Problem #1:
+    B is used in arithmetic and as address in pair [B C] which leads to need for constant storing and restoring
+      Reduction of store/restore is one of the biggest ventures in which we can reduce the code size
+
+    Solution #1:
+      Add register for use as an arithmetic operand
+*/
+
+#define tiZEROA (unsigned char)0
 #define tiMOVAB (unsigned char)1    /* Move A to B */
 #define tiMOVAC (unsigned char)2    /* Move A to C */
 #define tiMOVAD (unsigned char)3    /* Move A to D */

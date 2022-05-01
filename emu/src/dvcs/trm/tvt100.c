@@ -9,99 +9,56 @@
 #define T_TRM_WD 80 /* Screen width */
 #define T_TRM_HG 25 /* Screen height */
 
-#define T_ESC_SEQ "\033["
-#define T_HIDE_CUR T_ESC_SEQ "?25l"
-#define T_SHOW_CUR T_ESC_SEQ "?25h"
-#define T_CLR_SCR T_ESC_SEQ "2J"
+#define T_TRMESQ "\033[" /* Escape sequence */
+#define T_TRMHCR T_TRMESQ "?25l" /* Hide cursor */
+#define T_TRMSCR T_TRMESQ "?25h" /* Show cursor */
+#define T_TRMCLR T_TRMESQ "2J" /* Clear screen */
 
-const T_U8 tTrmSzX = T_TRM_WD; /* Screen width */
-const T_U8 tTrmSzY = T_TRM_HG; /* Screen height */
-
-static T_U8 tTrmPosX;
-static T_U8 tTrmPosY;
-
-static T_U8 tTrmScr[T_TRM_WD * T_TRM_HG];
-
-T_HOT
-static
-void
-updCurXY(void)
-{
-  fprintf(
-    stdout,
-    T_ESC_SEQ "%d;%dH",
-    tTrmPosY + 1,
-    tTrmPosX + 1
-  );
-}
+/* Update cursor position */
+#define tTrmUpd() fprintf(stdout, T_TRMESQ"%d;%dH", tCpuRam[0x13] + 1, tCpuRam[0x12] + 1)
 
 void
-tznTrmCX(T_U8 pos)
-{
-  while (pos >= tTrmSzX)
-    pos -= tTrmSzX;
-  tTrmPosX = pos;
-  updCurXY();
-}
-
-void
-tznTrmCY(T_U8 pos)
-{
-  while (pos >= tTrmSzY)
-    pos -= tTrmSzY;
-  tTrmPosY = pos;
-  updCurXY();
-}
-
-/* NOTE These sequences aren't part of standard VT100 and might not be available */
-void
-tznTrmCV(T_U8 state)
-{
-  if (state == 0x01)
-    fputs(T_SHOW_CUR, stdout);
-  else
-    fputs(T_HIDE_CUR, stdout);
-}
-
-T_HOT
-void
-tznTrmPC(T_U8 ch)
+tTrmPutC(void)
 {
   /* TODO Current implementation is suboptimal, but we need to prevent terminal from evaluating newlines and other symbols */
-  tTrmScr[tTrmPosX + tTrmPosY * tTrmSzX] = ch;
-  fputc(ch, stdout);
-  if (tTrmSzX == (++tTrmPosX))
-  {
-    tTrmPosX = 0;
-    if (tTrmSzY == (++tTrmPosY))
-      tTrmPosY = 0;
+  fputc(tCpuRam[0x16], stdout);
+  if (T_TRM_WD == (++tCpuRam[0x12])) {
+    tCpuRam[0x12] = 0;
+    if (T_TRM_HG == (++tCpuRam[0x13]))
+      tCpuRam[0x13] = 0;
   }
-  updCurXY(); /* TODO It shouldn't need to update positions each time */
+  /* TODO We might need to flush stdout here? */
+  tTrmUpd(); /* TODO It shouldn't need to update positions each time */
 }
 
-T_U8
-tznTrmGC(T_U8 x, T_U8 y)
-{
-  /* TODO Wrap X and Y pos? It would be better for implementation to state that wrapping is underfined */
-  return tTrmScr[x + y * tTrmSzX];
-}
-
-#include "dvcs/ttrm.c"
-
-static
+/* TODO Doesn't seem like a good idea, hm */
 void
-tTrmInit(void)
+tTrmPrLt(const char* literal)
 {
-  T_U16 idx;
-  tTrmStat = tsNone;
-
-  tTrmPosX = 0;
-  tTrmPosY = 0;
-  updCurXY();
-
-  fputs(T_CLR_SCR, stdout);
-
-  idx = T_TRM_WD * T_TRM_HG;
-  while (idx--)
-    tTrmScr[idx] = 0;
+  while (*literal) {
+    tCpuRam[0x16] = *literal;
+    tTrmPutC();
+    ++literal;
+  }
 }
+
+#define T_TRMFx2() do { \
+  tCpuRam[0x12] %= T_TRM_WD; \
+  tTrmUpd(); \
+} while (0)
+
+#define T_TRMFx3() do { \
+  tCpuRam[0x13] %= T_TRM_HG; \
+  tTrmUpd(); \
+} while (0)
+
+#define T_TRMFx4() fputs(tCpuRam[0x14] ? T_TRMSCR : T_TRMHCR, stdout)
+#define T_TRMFx6() tTrmPutC()
+
+/* Initialization */
+#define T_TRMIN() do { \
+  tCpuRam[0x12] = 0; \
+  tCpuRam[0x13] = 0; \
+  tTrmUpd(); \
+  fputs(T_TRMCLR, stdout); \
+} while (0)

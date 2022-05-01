@@ -44,7 +44,6 @@ static
 void
 tTrmPutC(void)
 {
-  /* TODO Current implementation is suboptimal, but we need to prevent terminal from evaluating newlines and other symbols */
   tTrmScrM[tCpuRam[0x12] + tCpuRam[0x13] * T_TRM_WD] = tTrmFrAs(tCpuRam[0x16]);
   if (T_TRM_WD == (++tCpuRam[0x12])) {
     tCpuRam[0x12] = 0;
@@ -55,6 +54,7 @@ tTrmPutC(void)
   *tTrmXM = tCpuRam[0x12];
 }
 
+/* TODO Doesn't seem like a good idea, hm */
 void
 tTrmPrLt(const char* literal)
 {
@@ -67,15 +67,13 @@ tTrmPrLt(const char* literal)
 
 /* TODO Should we wrap in such way? Cropping it might be enough */
 #define T_TRMFx2() do { \
-  while (tCpuRam[0x12] >= T_TRM_WD) \
-    tCpuRam[0x12] -= T_TRM_WD; \
+  tCpuRam[0x12] %= T_TRM_WD; \
   *tTrmXM = tCpuRam[0x12]; \
 } while (0)
 
 /* TODO Should we wrap in such way? Cropping it might be enough */
 #define T_TRMFx3() do { \
-  while (tCpuRam[0x13] >= T_TRM_HG) \
-    tCpuRam[0x13] -= T_TRM_HG; \
+  tCpuRam[0x13] %= T_TRM_HG; \
   *tTrmYM = tCpuRam[0x13]; \
 } while (0)
 

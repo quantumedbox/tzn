@@ -5,13 +5,14 @@
 /* TODO: Implement mechanism for embedding custom ROMs */
 
 static const T_U8 def_rom[] = {
-  tiMOVIB, 0x0F,
+  tiMOVIC, 0x01,
+  tiMOVIB, 0x0E,
   tiOUTIM, 0x16,
   tiMOVMA,
   tiEQLI, 0x00,
-  tiJMPCRI, -9,
+  tiJMPCRI, -7,
   tiINCBC,
-  tiJMPRI, -10,
+  tiJMPRI, -14,
   'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', ' ', 0x00
 };
 
@@ -20,9 +21,9 @@ static const T_U8 def_rom[] = {
   static const char* filename;
 
   #define T_ROM_IN(mem, sz) { \
-    TZN_ASRT(((T_UPTR)(mem) + (sz)) > (T_UPTR)(mem), "RAM sz is incorrect, high address is overflowing"); \
+    T_ASSERT(((T_UPTR)(mem) + (sz)) > (T_UPTR)(mem), "RAM sz is incorrect, high address is overflowing"); \
     if (!filename) { \
-      TZN_ASRT((sz) >= sizeof(def_rom), "Cannot fit ROM in RAM"); \
+      T_ASSERT((sz) >= sizeof(def_rom), "Cannot fit ROM in RAM"); \
       tMemCopy((mem), def_rom, sizeof(def_rom)); \
     } else if (tznFlRd(filename, (mem), (sz), T_NULL, TZN_FL0)) \
       tError("Error while reading ROM"); \
@@ -30,8 +31,8 @@ static const T_U8 def_rom[] = {
 #else
 
   #define T_ROM_IN(mem, sz) { \
-    TZN_ASRT(((T_UPTR)(mem) + (sz)) > (T_UPTR)(mem), "RAM sz is incorrect, high address is overflowing"); \
-    TZN_ASRT((sz) >= sizeof(def_rom), "Cannot fit ROM in RAM"); \
+    T_ASSERT(((T_UPTR)(mem) + (sz)) > (T_UPTR)(mem), "RAM sz is incorrect, high address is overflowing"); \
+    T_ASSERT((sz) >= sizeof(def_rom), "Cannot fit ROM in RAM"); \
     tMemCopy((mem), def_rom, sizeof(def_rom)); \
   }
 #endif

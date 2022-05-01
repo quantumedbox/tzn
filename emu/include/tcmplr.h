@@ -29,13 +29,13 @@
 
 #ifdef __GNUC__
   #ifndef TZN_RLS
-    #define TZN_DEAD() TZN_ASRT(0, "Reached unreachable")
+    #define TZN_DEAD() T_ASSERT(0, "Reached unreachable")
   #else
     #define TZN_DEAD() __builtin_unreachable()
   #endif
 #else
   #ifndef TZN_RLS
-    #define TZN_DEAD() TZN_ASRT(0, "Reached unreachable")
+    #define TZN_DEAD() T_ASSERT(0, "Reached unreachable")
   #else
     #define TZN_DEAD() /* TODO Shouldn't be just ignored */
   #endif

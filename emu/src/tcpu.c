@@ -14,20 +14,20 @@
 /* TODO Must be zerosegment on 6502, but looks like it would require messing with linker */
 T_U8 tCpuRgA = 0x00;
 
-T_U8 tCpuRgBC[2] = { 0x00 };
+T_U8 tCpuRgBC[2] = { 0x00, 0x00 };
 #define tCpuRgB tCpuRgBC[0] /* TODO Make sure that endianess is valid for target, we just assume little endian at this point */
 #define tCpuRgC tCpuRgBC[1]
 
 T_U8 tCpuRgD = 0x00;
 
-T_U8 tCpuRgS[2] = { 0x00 };
+T_U8 tCpuRgS[2] = { 0x00, 0x00 };
 #define tCpuRgSL tCpuRgS[0]
 #define tCpuRgSH tCpuRgS[1]
 
 T_U8 tCpuRgF = 0x00; /* Flag Status Register */
 
 /* TODO It's probably possible to have it represented as array of bytes too */
-T_U16 tCpuRgPC = 0x00; /* 2 Program Counter 8-bit Registers */
+T_U16 tCpuRgPC = 0x0100; /* 2 Program Counter 8-bit Registers */
 
 T_U8 tCpuRam[T_PG_N * T_PG_SZ]; /* RAM mapping */
 
@@ -40,7 +40,7 @@ tCpuInit(void)
 {
   /* TODO Should be embedded in ROM from the start */
   tLog("Initializing cpu state...\n");
-  T_ROM_IN(tCpuRam, T_PG_N * T_PG_SZ);
+  T_ROM_IN(&tCpuRam[0x0100], (T_PG_N - 1) * T_PG_SZ);
 
   tLog("Initializing devices...\n");
   tDvcInit();
@@ -69,9 +69,10 @@ tCpuExec(void)
 
   while (1)
   {
+    printf("[A: %d, BC: %d, D: %d, PC: %d, OP: %d]\n", tCpuRgA, (T_U16)tCpuRgB, tCpuRgD, tCpuRgPC, tCpuRam[tCpuRgPC]);
     switch (tCpuRam[tCpuRgPC++])
     {
-      case tiMOV0A:
+      case tiZEROA:
       {
         tCpuRgA = 0;
         break;
@@ -424,19 +425,21 @@ tCpuExec(void)
       case tiOUTIA:
       {
         tCpuTemp = tCpuRam[tCpuRgPC++];
-        tCpuRam[tCpuRgPC] = tCpuRgA;
+        tCpuRam[tCpuTemp] = tCpuRgA;
         tDvcFlsh();
         break;
       }
       case tiOUTIM:
       {
+        /*printf("%i\n", (T_U16)tCpuRgB);*/
         tCpuTemp = tCpuRam[tCpuRgPC++];
-        tCpuRam[tCpuRgPC] = tCpuRam[(T_U16)tCpuRgB];
-        tDvcFlsh();
+        tCpuRam[tCpuTemp] = tCpuRam[(T_U16)tCpuRgB];
+        printf("dvc: %d, addr: %d, val: %d\n", tCpuTemp, (T_U16)tCpuRgB, tCpuRam[(T_U16)tCpuRgB]);
+        /*tDvcFlsh();*/
         break;
       }
       default: {
-        TZN_ASRT(0, "Instruction not implemented");
+        T_ASSERT(0, "Instruction not implemented");
       }
     }
   }

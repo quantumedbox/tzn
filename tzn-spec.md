@@ -35,8 +35,9 @@ Devices are mapped at first page in memory (address range 0x0000-0x00FF), where 
 | 0x13     | Cursor Y        | R/WF   | |
 | 0x14     | Cursor Visibility | R/WF | Non-zero value means that cursor is visible |
 | 0x15     | Char Set        | WF     | Set screen cell pointed at Cursor X/Y |
-| 0x16     | Char Out        | WF     | Outputs byte to screen buffer where position is pointed by Cursor X/Y registers, after which Cursor X is incremented and its carry is added to Cursor Y |
-| 0x1F     | Active          | R/F    | Specifies whether terminal is initialized and ready to respond for output. It might be affected by initialization of other graphical devices that conflict with terminal. Flushing it will cause initialization of trm |
+| 0x16     | Char Put        | WF     | Outputs byte to screen buffer where position is pointed by Cursor X/Y registers, after which Cursor X is incremented and its carry is added to Cursor Y |
+| 0x1E     | Status/Activate | R/F    | Holds non-zero value when trm is initialized. Flushing will cause initialization of trm |
+| 0x1F     | Deactivate      | F      | Flushing will cause deinitialization of trm |
 
 <!-- To consider: -->
 <!-- | 0x0F     | Char Mode       | R/W    | Dictate how incoming bytes are interpreted, default value is TRM_CHMOD_ASCII | -->
