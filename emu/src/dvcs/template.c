@@ -1,6 +1,6 @@
 /*
-  Replace 'DVC' to name of device
-  If something doesn't need to be implemented - delete it
+    Replace 'DVC' to name of device
+    If something doesn't need to be implemented - delete it
 */
 
 /* Flushing implementation */

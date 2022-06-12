@@ -16,81 +16,81 @@ static
 T_BOOL
 tFlExst(const char* filename)
 {
-  FILE* fp = fopen(filename, "r");
-  if (fp)
-  {
-    fclose(fp);
-    return T_TRUE;
-  }
-  return T_FALSE;
+    FILE* fp = fopen(filename, "r");
+    if (fp)
+    {
+        fclose(fp);
+        return T_TRUE;
+    }
+    return T_FALSE;
 }
 
 /* TODO Probably a good idea to assert some ferror() checks */
 T_ERR
 tznFlRd(const char* filename, T_U8* memory, T_U16 size, T_U16* was_read, T_U8 flags)
 {
-  FILE* fp;
-  long int fp_size;
-  size_t rdbt;
+    FILE* fp;
+    long int fp_size;
+    size_t rdbt;
 
-  fp = fopen(filename, "rb");
+    fp = fopen(filename, "rb");
 
-  if (!fp)
-    return 1;
+    if (!fp)
+        return 1;
 
-  #ifndef __CC65__
-  /* TODO EOF seeking is not guaranteed to work between implementations
-     https://wiki.sei.cmu.edu/confluence/display/c/FIO19-C.+Do+not+use+fseek()+and+ftell()+to+compute+the+size+of+a+regular+file
-     We might need to define different implementations on per target basis
-  */
-  if (fseek(fp, 0L, SEEK_END))
-    goto ERR_FILE;
+    #ifndef __CC65__
+    /* TODO EOF seeking is not guaranteed to work between implementations
+         https://wiki.sei.cmu.edu/confluence/display/c/FIO19-C.+Do+not+use+fseek()+and+ftell()+to+compute+the+size+of+a+regular+file
+         We might need to define different implementations on per target basis
+    */
+    if (fseek(fp, 0L, SEEK_END))
+        goto ERR_FILE;
 
-  fp_size = ftell(fp);
-  if (fp_size == -1L)
-    goto ERR_FILE;
+    fp_size = ftell(fp);
+    if (fp_size == -1L)
+        goto ERR_FILE;
 
-  rewind(fp);
-  #endif
+    rewind(fp);
+    #endif
 
-  /* By default it is an error to have file that couldn't fit into buffer */
-  if (!(flags & TZN_FLIS) && (fp_size > (long int)size))
-    goto ERR_FILE;
+    /* By default it is an error to have file that couldn't fit into buffer */
+    if (!(flags & TZN_FLIS) && (fp_size > (long int)size))
+        goto ERR_FILE;
 
-  rdbt = fread(memory, sizeof(T_U8), (size_t)size, fp);
-  if (rdbt != (size_t)fp_size)
-    goto ERR_FILE; 
+    rdbt = fread(memory, sizeof(T_U8), (size_t)size, fp);
+    if (rdbt != (size_t)fp_size)
+        goto ERR_FILE; 
 
-  if (was_read)
-    *was_read = rdbt;
+    if (was_read)
+        *was_read = rdbt;
 
-  fclose(fp);
-  return 0;
+    fclose(fp);
+    return 0;
 
 ERR_FILE:
-  fclose(fp);
-  return 1;
+    fclose(fp);
+    return 1;
 }
 
 T_ERR
 tznFlWr(const char* filename, T_U8* memory, T_U16 size, T_U8 flags)
 {
-  FILE* fp;
-  size_t written;
+    FILE* fp;
+    size_t written;
 
-  if (!(flags & TZN_FLRW) && (tFlExst(filename)))
-    goto ERR;
+    if (!(flags & TZN_FLRW) && (tFlExst(filename)))
+        goto ERR;
 
-  fp = fopen(filename, "wb");
-  if (!fp)
-    goto ERR;
+    fp = fopen(filename, "wb");
+    if (!fp)
+        goto ERR;
 
-  written = fwrite(memory, sizeof(T_U8), (size_t)size, fp);
-  if (written != (size_t)size)
-    goto ERR_FILE;
+    written = fwrite(memory, sizeof(T_U8), (size_t)size, fp);
+    if (written != (size_t)size)
+        goto ERR_FILE;
 
 ERR_FILE:
-  fclose(fp);
+    fclose(fp);
 ERR:
-  return 1;
+    return 1;
 }

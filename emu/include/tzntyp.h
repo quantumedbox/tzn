@@ -1,7 +1,7 @@
 #ifndef TZN_TYPH
 #define TZN_TYPH
 
-#include <stdint.h>
+#include "tarch.h"
 
 #define T_NULL    ((void*)0)
 
@@ -17,11 +17,15 @@
 #define T_U16MIN  ((T_U16)0)
 #define T_U16MAX  ((T_U16)-1)
 
-/*
-  Unsigned integer representation of pointer types
-  TODO It is from C99 standard, which is not as portable as I would like
-*/
-#define T_UPTR    intptr_t
+#if T_HOSTID == taMSDOS
+    #define T_UPTR sizeof(int)
+#else
+    /*
+        Unsigned integer representation of pointer types
+        TODO It is from C99 standard, which is not as portable as I would like
+    */
+    #define T_UPTR intptr_t
+#endif
 
 #define T_ERR     T_U8
 #define T_BOOL    T_U8
