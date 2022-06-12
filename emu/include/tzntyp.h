@@ -1,7 +1,7 @@
 #ifndef TZN_TYPH
 #define TZN_TYPH
 
-#include <stddef.h> /* TEMP */
+#include <stdint.h>
 
 #define T_NULL    ((void*)0)
 
@@ -14,12 +14,14 @@
 #define T_U8_MIN  ((T_U8)0)
 #define T_U8_MAX  ((T_U8)-1)
 
+#define T_U16MIN  ((T_U16)0)
+#define T_U16MAX  ((T_U16)-1)
+
 /*
   Unsigned integer representation of pointer types
-  TODO size_t isn't guaranteed to be able to hold every pointer value
-       we need to define it for each implementation in the future
+  TODO It is from C99 standard, which is not as portable as I would like
 */
-#define T_UPTR    size_t
+#define T_UPTR    intptr_t
 
 #define T_ERR     T_U8
 #define T_BOOL    T_U8

@@ -17,28 +17,13 @@
 
 #include T_CTR_D
 
-#ifdef T_TRM_D
+#if defined(T_TRM_D)
 #include T_TRM_D
 #endif
 
-#ifdef T_KBD_D
+#if defined(T_KBD_D)
 #include T_KBD_D
 #endif
-
-static
-void
-tDvcInit(void)
-{
-#if defined(T_CTRIN)
-  T_CTRIN();
-#endif
-#if defined(T_TRMIN)
-  T_TRMIN();
-#endif
-#if defined(T_KBDIN)
-  T_KBDIN();
-#endif
-}
 
 void
 tDvcFlsh(void)

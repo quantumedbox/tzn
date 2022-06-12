@@ -12,6 +12,11 @@
 
     Solution #1:
       Add register for use as an arithmetic operand
+
+  Problem #2:
+    Stack is one of the most commonly used things in programming, we need to define ops that would make it compact and easy to program
+
+    - tiSTCADD Reserves IMM bytes on the stack
 */
 
 #define tiZEROA (unsigned char)0
@@ -71,7 +76,8 @@
 #define tiMOVIMA (unsigned char)54  /* Move memory at immediate absolute address to A */
 #define tiMOVIAM (unsigned char)55  /* Move A to an absolute immediate address */
 #define tiCALLI (unsigned char)56   /* Store address at [SL SH] and perform jump to immediate absolute byte */
-#define tiFLSHI (unsigned char)57   /* Flush INT device */
-#define tiOUTIA (unsigned char)58   /* Move byte from A to [0x00 INT], then flush INT device */
-#define tiOUTIM (unsigned char)59   /* Move byte from [B C] to [0x00 INT], then flush INT device */
+#define tiFLSHI (unsigned char)57   /* Flush IMM device */
+#define tiOUTIA (unsigned char)58   /* Move byte from A to [0x00 IMM], then flush IMM device */
+#define tiOUTIM (unsigned char)59   /* Move byte from [B C] to [0x00 IMM], then flush IMM device */
+#define tiOUTII (unsigned char)60   /* Move IMM1 to [0x00 IMM0], then flush IMM0 device */
 #endif

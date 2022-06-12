@@ -1,10 +1,10 @@
-#ifndef T_ERRH
-#define T_ERRH
+#if !defined(TASRT_T)
+#define TASRT_T
 
 #include "tutils.h"
 
-#ifndef TZN_RLS
-  #ifndef __CC65__
+#if !defined(NDEBUG)
+  #if !defined(__CC65__)
     #define T_ASSERT(cond, literal) if (cond) {} else tError(__FILE__ ":" T_STREXP(__LINE__) ": \"" literal "\"")
   #else
     /* It appears that CC65 doesn't know how to handle string literal concatenation in this case, so, file and line information is ignored */

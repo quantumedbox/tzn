@@ -8,14 +8,14 @@ MAIN := $(BASE)/src/main/tzncli.c
 ASMFLAGS := --relax-checks --smart
 CCFLAGS := --standard c89 -Cl -r $(addprefix --asm-args ,$(ASMFLAGS)) # -DT_CPUASM
 
-RELEASEFLAGS := -Osir -DTZN_RLS
+RELEASEFLAGS := -Osir -DNDEBUG
 DEBUGFLAGS := -g --check-stack
 
-# ifndef TZN_RLS
-# 	CCFLAGS += $(DEBUGFLAGS)
-# else
-CCFLAGS += $(RELEASEFLAGS)
-# endif
+ifeq (${BUILD_TYPE}, Release)
+	CCFLAGS += $(RELEASEFLAGS)
+else
+	CCFLAGS += $(DEBUGFLAGS)
+endif
 
 .PHONY: all clean cleanobj
 

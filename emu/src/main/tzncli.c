@@ -5,19 +5,23 @@
 /* TODO: Implement mechanism for embedding custom ROMs */
 
 static const T_U8 def_rom[] = {
+  tiOUTII, 0x1F, 0x01,
+  tiOUTII, 0x12, 0x00,
+  tiOUTII, 0x13, 0x00,
+  tiOUTII, 0x14, 0x01,
   tiMOVIC, 0x01,
-  tiMOVIB, 0x0E,
+  tiMOVIB, 0x1A,
   tiOUTIM, 0x16,
   tiMOVMA,
   tiEQLI, 0x00,
-  tiJMPCRI, -7,
+  tiJMPCRI, -23,
   tiINCBC,
-  tiJMPRI, -14,
+  tiJMPRI, -10,
   'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', ' ', 0x00
 };
 
 /* Sets CPU initial RAM state on startup */
-#ifdef T_IO_C
+#if defined(T_IO_C)
   static const char* filename;
 
   #define T_ROM_IN(mem, sz) { \

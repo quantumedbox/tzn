@@ -6,6 +6,7 @@
 
 #include "ttzn.h"
 
+/* TODO Dependency on libc increases binary size quite a bit, we might consider having target speific implementations */
 /* TODO Abstract IO operations for portability on various libc implementations (Plan 9 for example) */
 /* TODO Move to shared TZN code, not EMU specific base */
 /* TODO Use <fcntl.h> instead, it provides simpler functions */
@@ -35,9 +36,13 @@ tznFlRd(const char* filename, T_U8* memory, T_U16 size, T_U16* was_read, T_U8 fl
   fp = fopen(filename, "rb");
 
   if (!fp)
-    goto ERR;
+    return 1;
 
   #ifndef __CC65__
+  /* TODO EOF seeking is not guaranteed to work between implementations
+     https://wiki.sei.cmu.edu/confluence/display/c/FIO19-C.+Do+not+use+fseek()+and+ftell()+to+compute+the+size+of+a+regular+file
+     We might need to define different implementations on per target basis
+  */
   if (fseek(fp, 0L, SEEK_END))
     goto ERR_FILE;
 
@@ -64,7 +69,6 @@ tznFlRd(const char* filename, T_U8* memory, T_U16 size, T_U16* was_read, T_U8 fl
 
 ERR_FILE:
   fclose(fp);
-ERR:
   return 1;
 }
 

@@ -1,4 +1,4 @@
-#ifndef TTZN_H
+#if !defined(TTZN_H)
 #define TTZN_H
 
 #include "tznops.h"

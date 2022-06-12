@@ -1,9 +1,9 @@
-#ifndef TCMPLR_H
+#if !defined(TCMPLR_H)
 #define TCMPLR_H
 
 #include "tzntyp.h"
 
-#ifdef __CC65__
+#if defined(__CC65__)
   #define T_HOTMEM(decl, sym) \
     _Pragma("bss-name (push, \"ZEROPAGE\")") \
     _Pragma("data-name (push, \"ZEROPAGE\")") \
@@ -15,7 +15,7 @@
   #define T_HOTMEM(decl, _) decl
 #endif
 
-#ifdef __GNUC__
+#if defined(__GNUC__)
   #define T_NORET   __attribute__((noreturn))
   #define T_HOT     __attribute__((hot))
   #define T_COLD    __attribute__((cold))
@@ -27,14 +27,14 @@
   #define T_INLINE  inline
 #endif
 
-#ifdef __GNUC__
-  #ifndef TZN_RLS
+#if defined(__GNUC__)
+  #if !defined(NDEBUG)
     #define TZN_DEAD() T_ASSERT(0, "Reached unreachable")
   #else
     #define TZN_DEAD() __builtin_unreachable()
   #endif
 #else
-  #ifndef TZN_RLS
+  #if !defined(NDEBUG)
     #define TZN_DEAD() T_ASSERT(0, "Reached unreachable")
   #else
     #define TZN_DEAD() /* TODO Shouldn't be just ignored */

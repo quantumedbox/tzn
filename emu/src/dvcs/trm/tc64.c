@@ -80,13 +80,10 @@ tTrmPrLt(const char* literal)
 #define T_TRMFx4() *tTrmVM = !tCpuRam[0x14] /* 0x00 - on, anything else - off */
 #define T_TRMFx6() tTrmPutC()
 
-/* TODO Should it be active on init? */
-#define T_TRMIN() do { \
-  tCpuRam[0x10] = T_TRM_WD; \
-  tCpuRam[0x11] = T_TRM_HG; \
-  tCpuRam[0x12] = 0x00; \
-  tCpuRam[0x13] = 0x00; \
-  tCpuRam[0x14] = 0x01; \
-  tCpuRam[0x1F] = 0x01; \
-  tMemSet(tTrmScrM, 0x20, T_SCR_SZ); \
+#define T_TRMFxF() do { \
+  if (tCpuRam[0x1F]) { \
+    tCpuRam[0x10] = T_TRM_WD; \
+    tCpuRam[0x11] = T_TRM_HG; \
+    tMemSet(tTrmScrM, 0x20, T_SCR_SZ); \
+  } \
 } while (0)
